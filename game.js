@@ -21,7 +21,7 @@ window.onload = function () {
       autoCenter: Phaser.Scale.CENTER_BOTH,
       parent: "thegame",
       width: 900,
-      height: 720,
+      height: 900,
     },
     physics: {
       default: "arcade",
@@ -117,7 +117,7 @@ class GameIntro extends Phaser.Scene {
     // dialog TWO
     this.dialog2 = this.rexUI.add
       .dialog({
-        x: 400,
+        x:  game.config.width / 2,
         y: game.config.height / 2,
         width: 500,
         background: this.rexUI.add.roundRectangle(0, 0, 100, 100, 20, 0x533d8e),
