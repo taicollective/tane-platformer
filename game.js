@@ -60,6 +60,10 @@ class GameIntro extends Phaser.Scene {
       "kowhaiwhai",
       "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fkowhaiwhai.png?v=1609829230478"
     );
+    this.load.image(
+      "platformer-instructions",
+      "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fplatformer-instructions.png?v=1615280452997"
+    );
 
     this.load.scenePlugin(
       "rexuiplugin",
@@ -81,11 +85,12 @@ class GameIntro extends Phaser.Scene {
         background: this.rexUI.add.roundRectangle(0, 0, 100, 100, 20, 0x533d8e),
         content: this.createLabel(
           this,
-          "Help Tane create an Action step list by finding\nthe action step tokens related to his moemoeā",
+          "Find the keys to help unlock\nTāne's Action step tokens",
           50,
           50
         ),
-        actions: [this.createLabel(this, "BEGIN", 10, 10)],
+        description:  this.add.image(0, 0, "platformer-instructions"),
+        actions: [this.createLabel(this, "NEXT", 10, 10)],
         space: {
           left: 20,
           right: 20,
@@ -110,44 +115,45 @@ class GameIntro extends Phaser.Scene {
       .popUp(1000);
 
     // dialog TWO
-    // this.dialog2 = this.rexUI.add
-    //   .dialog({
-    //     x: 400,
-    //     y: game.config.height / 2,
-    //     width: 500,
-    //     background: this.rexUI.add.roundRectangle(0, 0, 100, 100, 20, 0x533d8e),
-    //     content: this.add.image(0, 0, "touchSides"),
-    //     content: this.createLabel(
-    //       this,
-    //       "Help Tane create an Action step list by finding\nthe action step tokens related to his moemoeā",
-    //       50,
-    //       50
-    //     ),
-    //     space: {
-    //       left: 20,
-    //       right: 20,
-    //       top: 50,
-    //       bottom: 20,
-    //       content: 20,
-    //       toolbarItem: 5,
-    //       choice: 15,
-    //       action: 15,
-    //     },
-    //     align: {
-    //       content: "center",
-    //       actions: "right", // 'center'|'left'|'right'
-    //     },
+    this.dialog2 = this.rexUI.add
+      .dialog({
+        x: 400,
+        y: game.config.height / 2,
+        width: 500,
+        background: this.rexUI.add.roundRectangle(0, 0, 100, 100, 20, 0x533d8e),
+        content:this.createLabel(
+          this,
+          "Hold space button to jump.\nThe longer you hold space the higher Tāne can jump!",
+          50,
+          50
+        ),
+        // description:  this.add.image(0, 0, "platformer-instructions"),
+        actions: [this.createLabel(this, "BEGIN", 10, 10)],
+        space: {
+          left: 20,
+          right: 20,
+          top: 50,
+          bottom: 20,
+          content: 20,
+          toolbarItem: 5,
+          choice: 15,
+          action: 15,
+        },
+        align: {
+          content: "center",
+          actions: "right", // 'center'|'left'|'right'
+        },
 
-    //     click: {
-    //       mode: "release",
-    //     },
-    //   })
-    //   .layout()
-    //   // .drawBounds(this.add.graphics(), 0xff0000)
-    //   .setVisible(false)
+        click: {
+          mode: "release",
+        },
+      })
+      .layout()
+      // .drawBounds(this.add.graphics(), 0xff0000)
+      .setVisible(false)
 
     var tween = this.tweens.add({
-      targets: [this.dialog1],
+      targets: [this.dialog1,this.dialog2],
       scaleX: 1,
       scaleY: 1,
       ease: "Bounce", // 'Cubic', 'Elastic', 'Bounce', 'Back'
@@ -156,18 +162,18 @@ class GameIntro extends Phaser.Scene {
       yoyo: false,
     });
 
-    // this.dialog1.on(
-    //   "button.click",
-    //   function (button) {
-    //     if (button.text === "NEXT") {
-    //       this.dialog1.setVisible(false)
-    //       this.dialog2.setVisible(true).popUp(1000)
-    //     }
-    //   },
-    //   this
-    // );
-
     this.dialog1.on(
+      "button.click",
+      function (button) {
+        if (button.text === "NEXT") {
+          this.dialog1.setVisible(false)
+          this.dialog2.setVisible(true).popUp(1000)
+        }
+      },
+      this
+    );
+
+    this.dialog2.on(
       "button.click",
       function (button) {
         if (button.text === "BEGIN") {
@@ -557,6 +563,9 @@ class GamePlay extends Phaser.Scene {
     this.gotKeyYellow = false
     this.gotKeyGreen = false
     this.gotKeyRed = false
+    completedGreenMission = false
+    completedYellowMission = false
+    completedRedMission = false
     this.jumptimer = 0;
   }
   preload() {
