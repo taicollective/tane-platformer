@@ -73,6 +73,8 @@ class GameIntro extends Phaser.Scene {
     );
   }
   create() {
+    
+    
     this.add.image(240, 320, "background").setScrollFactor(1, 0);
     this.add.tileSprite(game.config.width / 2, game.config.height / 2 + 500, game.config.width, 3000, "kowhaiwhai").setScrollFactor(0, 0.25).setAlpha(0.2).setScale(1);
 
