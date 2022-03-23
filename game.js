@@ -1,17 +1,7 @@
-;;
-/*
-Map size:
-width: 100 tiles (128x128 each)
-height: 14
-
-w: 12800
-h: 
-
-*/
 let game;
 
+// game configuration
 window.onload = function () {
-  // game configuration object
   const gameConfig = {
     type: Phaser.AUTO,
     backgroundColor: 0x444444,
@@ -32,8 +22,10 @@ window.onload = function () {
         debug: false
       }
     },
+    // 5 DIFFERENT SCENES
     scene: [GameIntro, GamePlay, GameOver, GameWin, GameHud],
   };
+  // new game bruh
   game = new Phaser.Game(gameConfig);
   window.focus();
 };
@@ -48,10 +40,15 @@ var completedGreenMission = false
 var completedYellowMission = false
 var completedRedMission = false
 
+
+/* ======================
+    GAME INTRO SCENE
+=========================*/
 class GameIntro extends Phaser.Scene {
   constructor() {
     super("game-intro");
   }
+  // preloads for the intro scene
   preload() {
     this.load.image("platform", "https://cdn.glitch.com/f605c78d-cefb-481c-bb78-d09a6bffa1e6%2Fground_grass.png?v=1603601137907");
     this.load.image("background", "https://cdn.glitch.com/f605c78d-cefb-481c-bb78-d09a6bffa1e6%2Fbg_layer1.png?v=1603601139028");
@@ -72,13 +69,14 @@ class GameIntro extends Phaser.Scene {
       "rexUI"
     );
   }
-  create() {
-    
-    
+  // create for the intro scene
+  create() {  
+    // background
     this.add.image(240, 320, "background").setScrollFactor(1, 0);
+    // kowhaiwhai pattern
     this.add.tileSprite(game.config.width / 2, game.config.height / 2 + 500, game.config.width, 3000, "kowhaiwhai").setScrollFactor(0, 0.25).setAlpha(0.2).setScale(1);
 
-       // dialog ONE
+    // dialog ONE (Using rexUI)
     this.dialog1 = this.rexUI.add
       .dialog({
         x:  game.config.width / 2,
@@ -107,7 +105,6 @@ class GameIntro extends Phaser.Scene {
           center: "center",
           actions: "right", // 'center'|'left'|'right'
         },
-
         click: {
           mode: "release",
         },
@@ -186,26 +183,19 @@ class GameIntro extends Phaser.Scene {
       },
       this
     );
-
-
-
-
   }
-
+  // settings for the dialog labels
   createLabel(scene, text, spaceTop, spaceBottom) {
     return scene.rexUI.add.label({
       width: 40, // Minimum width of round-rectangle
       height: 40, // Minimum height of round-rectangle
-
       background: scene.rexUI.add.roundRectangle(0, 0, 100, 40, 20, 0xffffff),
-
       text: scene.add.text(0, 0, text, {
         fontSize: "24px",
         color: "#533d8e",
         stroke: "#533d8e",
         strokeThickness: 2,
       }),
-
       space: {
         left: 10,
         right: 10,
@@ -214,16 +204,17 @@ class GameIntro extends Phaser.Scene {
       },
     });
   }
-
-  // method to be executed at each frame
   update() {}
 }
 
+/* ======================
+    GAME OVER SCENE
+=========================*/
 class GameOver extends Phaser.Scene {
   constructor() {
     super("game-over");
   }
-
+  // Game Over scene preload
   preload() {
     this.load.audio(
       "die",
@@ -235,8 +226,9 @@ class GameOver extends Phaser.Scene {
       "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fgameover-music.mp3?v=1609829224481"
     );
   }
-
+  // Game Over scene create
   create() {
+    // music
     this.scene.stop("game-hud")
     this.scene.stop("game-play")
     this.sound.stopAll()
@@ -292,6 +284,9 @@ class GameOver extends Phaser.Scene {
   }
 }
 
+/* ======================
+    GAME WIN SCENE
+=========================*/
 class GameWin extends Phaser.Scene {
   constructor() {
     super("game-win");
@@ -361,6 +356,9 @@ class GameWin extends Phaser.Scene {
   }
 }
 
+/* ======================
+    GAME HUD SCENE
+=========================*/
 class GameHud extends Phaser.Scene {
   constructor() {
     super("game-hud");
@@ -368,6 +366,7 @@ class GameHud extends Phaser.Scene {
   init() {
     this.countdownTime = 60
   }
+  // Game hud preload
   preload() {
     this.load.audio(
       "cheer",
@@ -387,7 +386,6 @@ class GameHud extends Phaser.Scene {
       "red-token-type",
       "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Ftane-red-token.png?v=1609829227986"
     );
-
 
     this.load.image(
       "green-token-overlay",
@@ -428,7 +426,7 @@ class GameHud extends Phaser.Scene {
     );
 
   }
-
+  // Game hud create
   create() {
     this.cameras.main.fadeIn(2000, 0, 0, 0);
     // ====================== timer text =============================
@@ -556,6 +554,9 @@ class GameHud extends Phaser.Scene {
   }
 }
 
+/* ======================
+    GAME PLAY SCENE   <<==
+=========================*/
 class GamePlay extends Phaser.Scene {
   constructor() {
     super("game-play");
