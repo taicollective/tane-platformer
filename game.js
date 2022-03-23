@@ -555,7 +555,7 @@ class GameHud extends Phaser.Scene {
 }
 
 /* ======================
-    GAME PLAY SCENE   <<==
+    GAME PLAY SCENE   <<---- THIS IS THE ACTUAL GAME
 =========================*/
 class GamePlay extends Phaser.Scene {
   constructor() {
@@ -572,7 +572,6 @@ class GamePlay extends Phaser.Scene {
     this.jumptimer = 0;
   }
   preload() {
-
     // ====================== tilesheets =============================
     this.load.image("ground", "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fspritesheet_ground.png?v=1597798791918");
     this.load.image("tiles", "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fspritesheet_tiles.png?v=1597798793579");
@@ -971,9 +970,7 @@ class GamePlay extends Phaser.Scene {
     this.physics.add.collider(this.player, this.levelObjects);
 
   }
-
-
-
+  //   Game Play Update (this is updating all the time)
   update() {
     // Control the player with left or right keys
     if (this.cursors.left.isDown) {
@@ -1034,7 +1031,8 @@ class GamePlay extends Phaser.Scene {
     // log player x y location
     // console.log(Math.round(this.player.x), Math.round(this.player.y))
   }
-
+  
+  // Other custom game functions
   // ================ death function ========================
   playerHit(player, spike) {
     // console.log("player was hit")
