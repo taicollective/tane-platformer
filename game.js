@@ -617,10 +617,10 @@ class GamePlay extends Phaser.Scene {
     this.load.image('Layer 4', 'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/Layer%204.png?v=1648158596600')
     this.load.image('Layer 5', 'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/Layer%205.png?v=1648158596780')
     
-    this.load.image(
-      "kowhaiwhai",
-      "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fkowhaiwhai.png?v=1609829230478"
-    );
+    // this.load.image(
+    //   "kowhaiwhai",
+    //   "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fkowhaiwhai.png?v=1609829230478"
+    // );
 
     // ====================== player (atlas) =============================
     this.load.atlas("player", "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fkenney_player.png?v=1598396905743", "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fkenney_player_atlas.json?v=1598396922994");
@@ -719,11 +719,27 @@ class GamePlay extends Phaser.Scene {
     // const backgroundImage = this.add.image(0, 0, "clouds").setOrigin(0, 0);
     // backgroundImage.setScale(2, 0.8);
     // backgroundImage.setScrollFactor(0.4)
+    const bgScale = 1
     
-    let bg_layer1 = this.add.image(0, 0, 'Layer 5').setOrigin(0, -100)
-    bg_layer1.setScale(0.7)
+    let bg_layer1 = this.add.image(0, 0, 'Layer 1').setOrigin(0, 0)
+    let bg_layer2 = this.add.image(0, 0, 'Layer 2').setOrigin(0, 0)
+    let bg_layer3 = this.add.image(0, 0, 'Layer 3').setOrigin(0, 0)
+    let bg_layer4 = this.add.image(0, 0, 'Layer 4').setOrigin(0, 0)
+    let bg_layer5 = this.add.image(0, 0, 'Layer 5').setOrigin(0, 0)
+    
+    bg_layer5.setScale(bgScale)
+    bg_layer4.setScale(bgScale)
+    bg_layer3.setScale(bgScale)
+    bg_layer2.setScale(bgScale)
+    bg_layer1.setScale(bgScale)
+    
+    bg_layer5.setScrollFactor(0.5)
+    bg_layer4.setScrollFactor(0.4)
+    bg_layer3.setScrollFactor(0.3)
+    bg_layer2.setScrollFactor(0.2)
+    bg_layer1.setScrollFactor(0.1)
 
-    this.add.tileSprite(game.config.width/2, game.config.height/2, game.config.width, 3000, "kowhaiwhai").setScrollFactor(0.1, 0).setAlpha(0.2).setScale(1);
+    // this.add.tileSprite(game.config.width/2, game.config.height/2, game.config.width, 3000, "kowhaiwhai").setScrollFactor(0.1, 0).setAlpha(0.2).setScale(1);
 
     // ====================== map =============================
     const map = this.make.tilemap({
