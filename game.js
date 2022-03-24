@@ -11,7 +11,7 @@ window.onload = function () {
       autoCenter: Phaser.Scale.CENTER_BOTH,
       parent: "thegame",
       width: 900,
-      height: 900,
+      height: 600,
     },
     physics: {
       default: "arcade",
@@ -23,7 +23,13 @@ window.onload = function () {
       }
     },
     // 5 DIFFERENT SCENES
-    scene: [GameIntro, GamePlay, GameOver, GameWin, GameHud],
+    scene: [
+      // GameIntro, 
+      GamePlay,
+      // GameOver, 
+      // GameWin, 
+      // GameHud,
+      ]
   };
   // new game bruh
   game = new Phaser.Game(gameConfig);
@@ -51,7 +57,7 @@ class GameIntro extends Phaser.Scene {
   // preloads for the intro scene
   preload() {
     this.load.image("platform", "https://cdn.glitch.com/f605c78d-cefb-481c-bb78-d09a6bffa1e6%2Fground_grass.png?v=1603601137907");
-    this.load.image("background", "https://cdn.glitch.com/f605c78d-cefb-481c-bb78-d09a6bffa1e6%2Fbg_layer1.png?v=1603601139028");
+    // this.load.image("background", "https://cdn.glitch.com/f605c78d-cefb-481c-bb78-d09a6bffa1e6%2Fbg_layer1.png?v=1603601139028");
     this.load.image("touchSides", "https://cdn.glitch.com/f605c78d-cefb-481c-bb78-d09a6bffa1e6%2Ftouch-sides.png?v=1603601138715");
     this.load.image(
       "kowhaiwhai",
@@ -68,11 +74,19 @@ class GameIntro extends Phaser.Scene {
       "rexUI",
       "rexUI"
     );
+    
+    
   }
   // create for the intro scene
   create() {  
-    // background
-    this.add.image(240, 320, "background").setScrollFactor(1, 0);
+    // background layers
+    // this.add.image(240, 320, "background").setScrollFactor(1, 0);
+    this.add.image(240, 320, "Layer 5").setScrollFactor(1, 0);
+    this.add.image(240, 320, "Layer 4").setScrollFactor(1, 0);
+    this.add.image(240, 320, "Layer 3").setScrollFactor(1, 0);
+    this.add.image(240, 320, "Layer 2").setScrollFactor(1, 0);
+    this.add.image(240, 320, "Layer 1").setScrollFactor(1, 0);
+    
     // kowhaiwhai pattern
     this.add.tileSprite(game.config.width / 2, game.config.height / 2 + 500, game.config.width, 3000, "kowhaiwhai").setScrollFactor(0, 0.25).setAlpha(0.2).setScale(1);
 
@@ -596,6 +610,13 @@ class GamePlay extends Phaser.Scene {
     this.load.image("lockBlue", "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2FlockBlue.png?v=1609637921863");
     this.load.image("lockGreen", "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2FlockGreen.png?v=1609637921863");
     this.load.image("lockYellow", "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2FlockYellow.png?v=1609637922248");
+    
+    this.load.image('Layer 1', 'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/Layer%201.png?v=1648158596495')
+    this.load.image('Layer 2', 'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/Layer%202.png?v=1648158595903')
+    this.load.image('Layer 3', 'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/Layer%203.png?v=1648158596129')
+    this.load.image('Layer 4', 'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/Layer%204.png?v=1648158596600')
+    this.load.image('Layer 5', 'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/Layer%205.png?v=1648158596780')
+    
     this.load.image(
       "kowhaiwhai",
       "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fkowhaiwhai.png?v=1609829230478"
@@ -695,9 +716,12 @@ class GamePlay extends Phaser.Scene {
     this.player.body.setSize(this.player.width - 100, this.player.height - 50).setOffset(50, 25);
 
     // ====================== background =============================
-    const backgroundImage = this.add.image(0, 0, "clouds").setOrigin(0, 0);
-    backgroundImage.setScale(2, 0.8);
-    backgroundImage.setScrollFactor(0.4)
+    // const backgroundImage = this.add.image(0, 0, "clouds").setOrigin(0, 0);
+    // backgroundImage.setScale(2, 0.8);
+    // backgroundImage.setScrollFactor(0.4)
+    
+    let bg_layer1 = this.add.image(0, 0, 'Layer 5').setOrigin(0, -100)
+    bg_layer1.setScale(0.7)
 
     this.add.tileSprite(game.config.width/2, game.config.height/2, game.config.width, 3000, "kowhaiwhai").setScrollFactor(0.1, 0).setAlpha(0.2).setScale(1);
 
