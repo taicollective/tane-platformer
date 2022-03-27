@@ -721,15 +721,15 @@ class GamePlay extends Phaser.Scene {
     this.player.body.setSize(this.player.width - 100, this.player.height - 50).setOffset(50, 25);
 
     // ====================== background =============================
-    const bgScale = 1
+    const bgScale = 1.1
     
     const bgXIndent = 0
     const bgYIndent = 0
     
     let bg_layer1 = this.add.image(bgXIndent, bgYIndent, 'Layer 1').setOrigin(0, 0)
-    let bg_layer2 = this.add.image(0, 0, 'Layer 2').setOrigin(0, 0)
-    let bg_layer3 = this.add.image(0, 0, 'Layer 3').setOrigin(0, 0)
-    let bg_layer4 = this.add.image(0, 0, 'Layer 4').setOrigin(0, 0)
+    let bg_layer2 = this.add.image(bgXIndent, bgYIndent, 'Layer 2').setOrigin(0, 0)
+    let bg_layer3 = this.add.image(bgXIndent, bgYIndent, 'Layer 3').setOrigin(0, 0)
+    let bg_layer4 = this.add.image(bgXIndent, bgYIndent, 'Layer 4').setOrigin(0, 0)
     
     bg_layer4.setScale(bgScale)
     bg_layer3.setScale(bgScale)
@@ -850,15 +850,21 @@ class GamePlay extends Phaser.Scene {
 
     // ====================== MAP LAYERS =============================
 
-    const mapScale = 0.125
+    const mapScale = 0.2
+    const mapXIndent = 0
+    const mapYIndent = -200
     
     //----- platforms
-    const platforms = map.createLayer("Platforms", groundTileset, 0, 0).setOrigin(0, 0)
-    const bridges = map.createLayer("Bridge", detailTiles, 0, 0).setOrigin(0, 0)
+    const platforms = map.createLayer("Platforms", groundTileset, mapXIndent, mapYIndent).setOrigin(0, 0)
+    const bridges = map.createLayer("Bridge", detailTiles, mapXIndent, mapYIndent).setOrigin(0, 0)
+    const crates = map.createLayer("Crates", detailTiles, mapXIndent, mapYIndent).setOrigin(0, 0)
+    
     platforms.setCollisionByExclusion(-1, true);
     platforms.setScale(mapScale, mapScale);
     bridges.setCollisionByExclusion(-1, true);
     bridges.setScale(mapScale, mapScale);
+    crates.setCollisionByExclusion(-1, true)
+    crates.setScale(mapScale, mapScale)
 
     //----- object layers
 
@@ -1009,6 +1015,8 @@ class GamePlay extends Phaser.Scene {
     // ====================== Colliders ======================
     this.physics.add.collider(this.player, platforms);
     this.physics.add.collider(this.player, bridges);
+    this.physics.add.collider(this.player, crates);
+    
     //----- Key colliders/actions
     // this.physics.add.overlap(this.player, yellowKey, this.handleGotKey, null, this);
     // this.physics.add.overlap(this.player, greenKey, this.handleGotKey, null, this);
