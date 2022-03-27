@@ -712,7 +712,7 @@ class GamePlay extends Phaser.Scene {
    
     // ====================== PLAYER =============================
     
-    const playerScale = 1
+    const playerScale = 1.4
     
     this.player = this.physics.add.sprite(50, 100, "taneIdle");
     this.player.setBounce(0.01);
@@ -858,7 +858,6 @@ class GamePlay extends Phaser.Scene {
     const platforms = map.createLayer("Platforms", groundTileset, mapXIndent, mapYIndent).setOrigin(0, 0)
     const bridges = map.createLayer("Bridge", detailTiles, mapXIndent, mapYIndent).setOrigin(0, 0)
     const crates = map.createLayer("Crates", detailTiles, mapXIndent, mapYIndent).setOrigin(0, 0)
-    const spikes = map.createLayer("Spikes", detailTiles, mapXIndent, mapYIndent).setOrigin(0, 0)
     
     platforms.setCollisionByExclusion(-1, true);
     platforms.setScale(mapScale, mapScale);
@@ -903,9 +902,9 @@ class GamePlay extends Phaser.Scene {
     // });
 
     // objects from map
-    // var spikesObjs = map.createFromObjects('Spikes', 250, {
-    //   key: 'spike'
-    // });
+    var spikesObjs = map.createFromObjects('Spikes', 250, {
+      key: 'spike'
+    });
     // var bridgeObjs = map.createFromObjects('Bridge', 133, {
     //   key: 'spike'
     // });
@@ -958,20 +957,20 @@ class GamePlay extends Phaser.Scene {
     // map.findObject("Bridge", obj => obj.name == "bridge");
 
     //----- Spikes
-    // let normalSpikes = [];
+    let normalSpikes = [];
     // let rotatedSpikes = [];
-    // map.findObject("Spikes", obj => {
-    //   if (obj.flippedVertical == true) {
-    //     rotatedSpikes.push(obj)
-    //   } else {
-    //     normalSpikes.push(obj)
-    //   }
-    // })
-    // normalSpikes.forEach(spikeObject => {
-    //   let spike = this.badStuff.create(spikeObject.x * 0.25, spikeObject.y * 0.25, 'spike').setOrigin(0, 1).setScale(0.25, 0.25)
-    //   spike.body.setSize(spike.width, spike.height - 60).setOffset(0, 60);
-    //   this.physics.add.collider(this.player, spike, this.playerHit, null, this);
-    // });
+    map.findObject("Spikes", obj => {
+      if (obj.flippedVertical == true) {
+        console.log('vertical spikes found')
+      } else {
+        normalSpikes.push(obj)
+      }
+    })
+    normalSpikes.forEach(spikeObject => {
+      let spike = this.badStuff.create(spikeObject.x * 0.25, spikeObject.y * 0.25, 'spike').setOrigin(0, 1).setScale(0.25, 0.25)
+      spike.body.setSize(spike.width, spike.height - 60).setOffset(0, 60);
+      this.physics.add.collider(this.player, spike, this.playerHit, null, this);
+    });
     // rotatedSpikes.forEach(spikeObject => {
     //   let spike = this.badStuff.create(spikeObject.x * 0.25, spikeObject.y * 0.25, 'spike').setOrigin(0, 1).setScale(0.25, 0.25).setFlipY(true)
     //   spike.body.setSize(spike.width, spike.height - 60).setOffset(0, -5);
@@ -1017,7 +1016,6 @@ class GamePlay extends Phaser.Scene {
     this.physics.add.collider(this.player, platforms);
     this.physics.add.collider(this.player, bridges);
     this.physics.add.collider(this.player, crates);
-    this.physics.add.collider(this.player, spikes)
     
     //----- Key colliders/actions
     // this.physics.add.overlap(this.player, yellowKey, this.handleGotKey, null, this);
@@ -1028,14 +1026,18 @@ class GamePlay extends Phaser.Scene {
   }
   //   Game Play Update (this is updating all the time)
   update() {
+    
+    const playerJump = -250
+    const playerVelocity = 200
+    
     // Control the player with left or right keys
     if (this.cursors.left.isDown) {
-      this.player.setVelocityX(-200);
+      this.player.setVelocityX(-playerVelocity);
       if (this.player.body.onFloor()) {
         this.player.play('taneRun', true);
       }
     } else if (this.cursors.right.isDown) {
-      this.player.setVelocityX(200);
+      this.player.setVelocityX(playerVelocity);
       if (this.player.body.onFloor()) {
         this.player.play('taneRun', true);
       }
@@ -1059,7 +1061,7 @@ class GamePlay extends Phaser.Scene {
     if (this.cursors.space.isDown && this.player.body.onFloor()) {
       //player is on the ground, so he is allowed to start a jump
       this.jumptimer = 1;
-      this.player.body.velocity.y = -150;
+      this.player.body.velocity.y = playerJump;
       this.player.play('taneJump', false);
       this.sound.play("jump"); 
     } else if (this.cursors.space.isDown && (this.jumptimer != 0)) {
@@ -1069,7 +1071,7 @@ class GamePlay extends Phaser.Scene {
         // this.player.play('taneJump', false);
       } else { // player is allowed to jump higher (not yet 30 frames of jumping)
         this.jumptimer++;
-        this.player.body.velocity.y = -150;
+        this.player.body.velocity.y = playerJump;
         // this.player.play('taneJump', false);
       }
     } else if (this.jumptimer != 0) { //reset this.jumptimer since the player is no longer holding the jump key
@@ -1091,21 +1093,21 @@ class GamePlay extends Phaser.Scene {
   // Other custom game functions
   // ================ death function ========================
   playerHit(player, spike) {
-    // console.log("player was hit")
+    console.log("player was hit")
     // player.setVelocity(0, 0);
     // player.setX(50);
     // player.setY(300);
     // player.play('idle', true);
     // player.setAlpha(0);
-    // let tw = this.tweens.add({
-    //   targets: player,
-    //   alpha: 1,
-    //   duration: 100,
-    //   ease: 'Linear',
-    //   repeat: 5,
-    // });
+    let tw = this.tweens.add({
+      targets: player,
+      alpha: 1,
+      duration: 100,
+      ease: 'Linear',
+      repeat: 5,
+    });
     console.log("player died")
-    this.scene.start("game-over")
+    // this.scene.start("game-over")
   }
   // ================ got key function ========================
   handleGotKey(player, key) {
