@@ -846,7 +846,7 @@ class GamePlay extends Phaser.Scene {
 
     // ====================== MAP LAYERS =============================
 
-    const mapScale = 1
+    const mapScale = 0.125
     
     //----- platforms
     const platforms = map.createLayer("Platforms", groundTileset, 0, 0).setOrigin(0, 0)
@@ -1003,8 +1003,8 @@ class GamePlay extends Phaser.Scene {
     // this.physics.add.overlap(this.player, exitDoorLower, this.reachedExit, null, this);
 
     // ====================== Colliders ======================
-    // this.physics.add.collider(this.player, platforms);
-    // this.physics.add.collider(this.player, bridges);
+    this.physics.add.collider(this.player, platforms);
+    this.physics.add.collider(this.player, bridges);
     //----- Key colliders/actions
     // this.physics.add.overlap(this.player, yellowKey, this.handleGotKey, null, this);
     // this.physics.add.overlap(this.player, greenKey, this.handleGotKey, null, this);
