@@ -850,14 +850,15 @@ class GamePlay extends Phaser.Scene {
 
     // ====================== MAP LAYERS =============================
 
-    const mapScale = 0.2
+    const mapScale = 0.4
     const mapXIndent = 0
-    const mapYIndent = -200
+    const mapYIndent = -900
     
     //----- platforms
     const platforms = map.createLayer("Platforms", groundTileset, mapXIndent, mapYIndent).setOrigin(0, 0)
     const bridges = map.createLayer("Bridge", detailTiles, mapXIndent, mapYIndent).setOrigin(0, 0)
     const crates = map.createLayer("Crates", detailTiles, mapXIndent, mapYIndent).setOrigin(0, 0)
+    const spikes = map.createLayer("Spikes", detailTiles, mapXIndent, mapYIndent).setOrigin(0, 0)
     
     platforms.setCollisionByExclusion(-1, true);
     platforms.setScale(mapScale, mapScale);
@@ -1016,6 +1017,7 @@ class GamePlay extends Phaser.Scene {
     this.physics.add.collider(this.player, platforms);
     this.physics.add.collider(this.player, bridges);
     this.physics.add.collider(this.player, crates);
+    this.physics.add.collider(this.player, spikes)
     
     //----- Key colliders/actions
     // this.physics.add.overlap(this.player, yellowKey, this.handleGotKey, null, this);
