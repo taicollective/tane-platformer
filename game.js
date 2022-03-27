@@ -751,24 +751,24 @@ class GamePlay extends Phaser.Scene {
     const detailTiles = map.addTilesetImage("spritesheet_tiles", "tiles");
 
     // ====================== get the level rectangle =============================
-    const level1Rec = map.findObject("levels", obj => obj.name === "level1");
-    console.log(level1Rec.width)
-    console.log(level1Rec.height)
+    // const level1Rec = map.findObject("levels", obj => obj.name === "level1");
+    // console.log(level1Rec.width)
+    // console.log(level1Rec.height)
 
     // ====================== world physics =============================
-    this.physics.world.bounds.width = level1Rec.width*0.25;
-    this.physics.world.bounds.height = level1Rec.height*0.25;
-    this.player.setCollideWorldBounds(true);
+    // this.physics.world.bounds.width = level1Rec.width*0.25;
+    // this.physics.world.bounds.height = level1Rec.height*0.25;
+    // this.player.setCollideWorldBounds(true);
 
     // ====================== Camera ======================
     // this.cameras.main.setViewport(0, 0, level1Rec.width/2, level1Rec.height/2);
-    this.cameras.main.setBounds(level1Rec.x, level1Rec.y, level1Rec.width*0.25, level1Rec.height*0.25, true);
+    // this.cameras.main.setBounds(level1Rec.x, level1Rec.y, level1Rec.width*0.25, level1Rec.height*0.25, true);
     // Set camera follow player
-    this.cameras.main.startFollow(this.player);
+    // this.cameras.main.startFollow(this.player);
     // Set camera fade in
-    this.cameras.main.fadeIn(2000, 0, 0, 0);
-    this.cameras.main.setZoom(2);
-    this.cameras.main.setFollowOffset(0, 50);
+    // this.cameras.main.fadeIn(2000, 0, 0, 0);
+    // this.cameras.main.setZoom(2);
+    // this.cameras.main.setFollowOffset(0, 50);
 
     // ====================== Animations ======================
     this.anims.create({
@@ -846,13 +846,15 @@ class GamePlay extends Phaser.Scene {
 
     // ====================== MAP LAYERS =============================
 
+    const mapScale = 1
+    
     //----- platforms
-    const platforms = map.createLayer("Platforms", groundTileset, 0, 0).setOrigin(0, 0);
-    const bridges = map.createLayer("Bridges", detailTiles, 0, 0).setOrigin(0, 0);
+    const platforms = map.createLayer("Platforms", groundTileset, 0, 0).setOrigin(0, 0)
+    const bridges = map.createLayer("Bridge", detailTiles, 0, 0).setOrigin(0, 0)
     platforms.setCollisionByExclusion(-1, true);
-    platforms.setScale(0.25, 0.25);
+    platforms.setScale(mapScale, mapScale);
     bridges.setCollisionByExclusion(-1, true);
-    bridges.setScale(0.25, 0.25);
+    bridges.setScale(mapScale, mapScale);
 
     //----- object layers
 
