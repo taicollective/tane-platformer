@@ -890,124 +890,124 @@ class GamePlay extends Phaser.Scene {
     // });
 
     // objects from map
-    var spikesObjs = map.createFromObjects('Spikes', 250, {
-      key: 'spike'
-    });
-    var bridgeObjs = map.createFromObjects('Bridge', 133, {
-      key: 'spike'
-    });
-    var greenLockObjs = map.createFromObjects('greenDoor', 219, {
-      key: 'lockGreen'
-    });
+    // var spikesObjs = map.createFromObjects('Spikes', 250, {
+    //   key: 'spike'
+    // });
+    // var bridgeObjs = map.createFromObjects('Bridge', 133, {
+    //   key: 'spike'
+    // });
+    // var greenLockObjs = map.createFromObjects('greenDoor', 219, {
+    //   key: 'lockGreen'
+    // });
 
     // console.log('lavaObjs',lavaObjs)
     // console.log('spikesObjs',spikesObjs)
     // console.log("Bridge")
 
     //----- Lavas
-    let normalLavas = [];
-    let waveLavas = [];
-    map.findObject("Lava", obj => {
-      if (obj.gid == 148) {
-        normalLavas.push(obj)
-      } else if (obj.gid == 140) {
-        waveLavas.push(obj)
-      }
-    })
-    normalLavas.forEach(lavaObject => {
-      let lava = this.badStuff.create(lavaObject.x * 0.25, lavaObject.y * 0.25, 'lavaSquare').setOrigin(0, 1).setScale(0.25, 0.25)
-      this.physics.add.collider(this.player, lava, this.playerHit, null, this);
-    });
-    waveLavas.forEach(lavaWaveObject => {
-      let lava = this.badStuff.create(lavaWaveObject.x * 0.25, lavaWaveObject.y * 0.25, 'lavaWave').setOrigin(0, 1).setScale(0.25, 0.25)
-      lava.body.setSize(lava.width, lava.height - 50).setOffset(0, 50);
-      this.physics.add.collider(this.player, lava, this.playerHit, null, this);
-    });
+    // let normalLavas = [];
+    // let waveLavas = [];
+    // map.findObject("Lava", obj => {
+    //   if (obj.gid == 148) {
+    //     normalLavas.push(obj)
+    //   } else if (obj.gid == 140) {
+    //     waveLavas.push(obj)
+    //   }
+    // })
+    // normalLavas.forEach(lavaObject => {
+    //   let lava = this.badStuff.create(lavaObject.x * 0.25, lavaObject.y * 0.25, 'lavaSquare').setOrigin(0, 1).setScale(0.25, 0.25)
+    //   this.physics.add.collider(this.player, lava, this.playerHit, null, this);
+    // });
+    // waveLavas.forEach(lavaWaveObject => {
+    //   let lava = this.badStuff.create(lavaWaveObject.x * 0.25, lavaWaveObject.y * 0.25, 'lavaWave').setOrigin(0, 1).setScale(0.25, 0.25)
+    //   lava.body.setSize(lava.width, lava.height - 50).setOffset(0, 50);
+    //   this.physics.add.collider(this.player, lava, this.playerHit, null, this);
+    // });
 
     //----- Bridges
-    bridgeObjs.forEach(bridgeObject => {
-      let bridge = this.levelObjects.create(bridgeObject.x * 0.25, (bridgeObject.y * 0.25) - (bridgeObject.height * 0.25), 'bridge').setOrigin(0, 0).setScale(0.25, 0.25)
-      console.log("bridge")
-      this.physics.add.collider(this.player, bridge);
-      // this.physics.world.enable(bridge, 1);
-      bridge.setCollideWorldBounds()
-    });
+    // bridgeObjs.forEach(bridgeObject => {
+    //   let bridge = this.levelObjects.create(bridgeObject.x * 0.25, (bridgeObject.y * 0.25) - (bridgeObject.height * 0.25), 'bridge').setOrigin(0, 0).setScale(0.25, 0.25)
+    //   console.log("bridge")
+    //   this.physics.add.collider(this.player, bridge);
+    //   // this.physics.world.enable(bridge, 1);
+    //   bridge.setCollideWorldBounds()
+    // });
 
     //----- Green lock
-    greenLockObjs.forEach(greenLockObject => {
-      let greenLock = this.levelObjects.create(greenLockObject.x * 0.25, (greenLockObject.y * 0.25), 'lockGreen').setOrigin(0.5).setScale(0.25, 0.25)
-      greenLock.name = "greenLock"
-      this.physics.add.overlap(this.player, greenLock, this.tryOpenLock, null, this);
-    });
+    // greenLockObjs.forEach(greenLockObject => {
+    //   let greenLock = this.levelObjects.create(greenLockObject.x * 0.25, (greenLockObject.y * 0.25), 'lockGreen').setOrigin(0.5).setScale(0.25, 0.25)
+    //   greenLock.name = "greenLock"
+    //   this.physics.add.overlap(this.player, greenLock, this.tryOpenLock, null, this);
+    // });
 
     // other functions to get objects
     // let Bridge = map.getObjectLayer("Bridge")["objects"];
     // map.findObject("Bridge", obj => obj.name == "bridge");
 
     //----- Spikes
-    let normalSpikes = [];
-    let rotatedSpikes = [];
-    map.findObject("Spikes", obj => {
-      if (obj.flippedVertical == true) {
-        rotatedSpikes.push(obj)
-      } else {
-        normalSpikes.push(obj)
-      }
-    })
-    normalSpikes.forEach(spikeObject => {
-      let spike = this.badStuff.create(spikeObject.x * 0.25, spikeObject.y * 0.25, 'spike').setOrigin(0, 1).setScale(0.25, 0.25)
-      spike.body.setSize(spike.width, spike.height - 60).setOffset(0, 60);
-      this.physics.add.collider(this.player, spike, this.playerHit, null, this);
-    });
-    rotatedSpikes.forEach(spikeObject => {
-      let spike = this.badStuff.create(spikeObject.x * 0.25, spikeObject.y * 0.25, 'spike').setOrigin(0, 1).setScale(0.25, 0.25).setFlipY(true)
-      spike.body.setSize(spike.width, spike.height - 60).setOffset(0, -5);
-      this.physics.add.collider(this.player, spike, this.playerHit, null, this);
-    });
+    // let normalSpikes = [];
+    // let rotatedSpikes = [];
+    // map.findObject("Spikes", obj => {
+    //   if (obj.flippedVertical == true) {
+    //     rotatedSpikes.push(obj)
+    //   } else {
+    //     normalSpikes.push(obj)
+    //   }
+    // })
+    // normalSpikes.forEach(spikeObject => {
+    //   let spike = this.badStuff.create(spikeObject.x * 0.25, spikeObject.y * 0.25, 'spike').setOrigin(0, 1).setScale(0.25, 0.25)
+    //   spike.body.setSize(spike.width, spike.height - 60).setOffset(0, 60);
+    //   this.physics.add.collider(this.player, spike, this.playerHit, null, this);
+    // });
+    // rotatedSpikes.forEach(spikeObject => {
+    //   let spike = this.badStuff.create(spikeObject.x * 0.25, spikeObject.y * 0.25, 'spike').setOrigin(0, 1).setScale(0.25, 0.25).setFlipY(true)
+    //   spike.body.setSize(spike.width, spike.height - 60).setOffset(0, -5);
+    //   this.physics.add.collider(this.player, spike, this.playerHit, null, this);
+    // });
 
     //----- Keys (Yellow, Green & Red)
-    const yellowKeyTile = map.findObject("Keys", obj => obj.name === "YellowKey");
-    const greenKeyTile = map.findObject("Keys", obj => obj.name === "GreenKey");
-    const redKeyTile = map.findObject("Keys", obj => obj.name === "RedKey");
-    // const blueKeyTile = map.findObject("Keys", obj => obj.name === "BlueKey");
-    const yellowKey = this.levelObjects.create(yellowKeyTile.x * 0.25, yellowKeyTile.y * 0.25, 'keyYellow').setOrigin(0, 1).setScale(0.25, 0.25);
-    const greenKey = this.levelObjects.create(greenKeyTile.x * 0.25, greenKeyTile.y * 0.25, 'keyGreen').setOrigin(0, 1).setScale(0.25, 0.25);
-    const redKey = this.levelObjects.create(redKeyTile.x * 0.25, redKeyTile.y * 0.25, 'keyRed').setOrigin(0, 1).setScale(0.25, 0.25);
-    yellowKey.name = "yellowKey"
-    greenKey.name = "greenKey"
-    redKey.name = "redKey"
+    // const yellowKeyTile = map.findObject("Keys", obj => obj.name === "YellowKey");
+    // const greenKeyTile = map.findObject("Keys", obj => obj.name === "GreenKey");
+    // const redKeyTile = map.findObject("Keys", obj => obj.name === "RedKey");
+    // // const blueKeyTile = map.findObject("Keys", obj => obj.name === "BlueKey");
+    // const yellowKey = this.levelObjects.create(yellowKeyTile.x * 0.25, yellowKeyTile.y * 0.25, 'keyYellow').setOrigin(0, 1).setScale(0.25, 0.25);
+    // const greenKey = this.levelObjects.create(greenKeyTile.x * 0.25, greenKeyTile.y * 0.25, 'keyGreen').setOrigin(0, 1).setScale(0.25, 0.25);
+    // const redKey = this.levelObjects.create(redKeyTile.x * 0.25, redKeyTile.y * 0.25, 'keyRed').setOrigin(0, 1).setScale(0.25, 0.25);
+    // yellowKey.name = "yellowKey"
+    // greenKey.name = "greenKey"
+    // redKey.name = "redKey"
     // this.levelObjects.create(blueKeyTile.x* 0.25, blueKeyTile.y* 0.25, 'keyBlue').setOrigin(0, 1).setScale(0.25, 0.25);
 
     //----- Locks (Yellow & Red)
-    const yellowLockTile = map.getObjectLayer("yellowDoor").objects;
-    const redLockTile = map.getObjectLayer("redDoor").objects;
-    yellowLockTile.forEach(yellowLockObject => {
-      let yellowLock = this.levelObjects.create(yellowLockObject.x * 0.25, yellowLockObject.y * 0.25, 'lockYellow').setOrigin(0, 1).setScale(0.25, 0.25);
-      yellowLock.name = "yellowLock"
-      this.physics.add.overlap(this.player, yellowLock, this.tryOpenLock, null, this);
-    })
-    redLockTile.forEach(redLockObject => {
-      let redLock = this.levelObjects.create(redLockObject.x * 0.25, redLockObject.y * 0.25, 'lockRed').setOrigin(0, 1).setScale(0.25, 0.25);
-      redLock.name = "redLock"
-      this.physics.add.overlap(this.player, redLock, this.tryOpenLock, null, this);
-    })
+    // const yellowLockTile = map.getObjectLayer("yellowDoor").objects;
+    // const redLockTile = map.getObjectLayer("redDoor").objects;
+    // yellowLockTile.forEach(yellowLockObject => {
+    //   let yellowLock = this.levelObjects.create(yellowLockObject.x * 0.25, yellowLockObject.y * 0.25, 'lockYellow').setOrigin(0, 1).setScale(0.25, 0.25);
+    //   yellowLock.name = "yellowLock"
+    //   this.physics.add.overlap(this.player, yellowLock, this.tryOpenLock, null, this);
+    // })
+    // redLockTile.forEach(redLockObject => {
+    //   let redLock = this.levelObjects.create(redLockObject.x * 0.25, redLockObject.y * 0.25, 'lockRed').setOrigin(0, 1).setScale(0.25, 0.25);
+    //   redLock.name = "redLock"
+    //   this.physics.add.overlap(this.player, redLock, this.tryOpenLock, null, this);
+    // })
 
     //----- Exit door
-    const exitDoorUpperTile = map.findObject("Exit", obj => obj.name === "exitUpper");
-    const exitDoorLowerTile = map.findObject("Exit", obj => obj.name === "exitLower");
-    const exitDoorUpper = this.levelObjects.create(exitDoorUpperTile.x * 0.25, exitDoorUpperTile.y * 0.25, 'doorUpper').setOrigin(0, 1).setScale(0.25, 0.25);
-    const exitDoorLower = this.levelObjects.create(exitDoorLowerTile.x * 0.25, exitDoorLowerTile.y * 0.25, 'doorLower').setOrigin(0, 1).setScale(0.25, 0.25);
-    this.physics.add.overlap(this.player, exitDoorUpper, this.reachedExit, null, this);
-    this.physics.add.overlap(this.player, exitDoorLower, this.reachedExit, null, this);
+    // const exitDoorUpperTile = map.findObject("Exit", obj => obj.name === "exitUpper");
+    // const exitDoorLowerTile = map.findObject("Exit", obj => obj.name === "exitLower");
+    // const exitDoorUpper = this.levelObjects.create(exitDoorUpperTile.x * 0.25, exitDoorUpperTile.y * 0.25, 'doorUpper').setOrigin(0, 1).setScale(0.25, 0.25);
+    // const exitDoorLower = this.levelObjects.create(exitDoorLowerTile.x * 0.25, exitDoorLowerTile.y * 0.25, 'doorLower').setOrigin(0, 1).setScale(0.25, 0.25);
+    // this.physics.add.overlap(this.player, exitDoorUpper, this.reachedExit, null, this);
+    // this.physics.add.overlap(this.player, exitDoorLower, this.reachedExit, null, this);
 
     // ====================== Colliders ======================
-    this.physics.add.collider(this.player, platforms);
-    this.physics.add.collider(this.player, bridges);
+    // this.physics.add.collider(this.player, platforms);
+    // this.physics.add.collider(this.player, bridges);
     //----- Key colliders/actions
-    this.physics.add.overlap(this.player, yellowKey, this.handleGotKey, null, this);
-    this.physics.add.overlap(this.player, greenKey, this.handleGotKey, null, this);
-    this.physics.add.overlap(this.player, redKey, this.handleGotKey, null, this);
-    this.physics.add.collider(this.player, this.levelObjects);
+    // this.physics.add.overlap(this.player, yellowKey, this.handleGotKey, null, this);
+    // this.physics.add.overlap(this.player, greenKey, this.handleGotKey, null, this);
+    // this.physics.add.overlap(this.player, redKey, this.handleGotKey, null, this);
+    // this.physics.add.collider(this.player, this.levelObjects);
 
   }
   //   Game Play Update (this is updating all the time)
