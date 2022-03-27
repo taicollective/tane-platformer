@@ -11,7 +11,7 @@ window.onload = function () {
       autoCenter: Phaser.Scale.CENTER_BOTH,
       parent: "thegame",
       width: 900,
-      height: 600,
+      height: 500,
     },
     physics: {
       default: "arcade",
@@ -710,21 +710,23 @@ class GamePlay extends Phaser.Scene {
     this.music = this.sound.add("music", musicConfig);
     this.music.play();
    
-    // ====================== player =============================
-    // this.player = this.physics.add.sprite(50, 100, "player");
+    // ====================== PLAYER =============================
+    
+    const playerScale = 1
+    
     this.player = this.physics.add.sprite(50, 100, "taneIdle");
     this.player.setBounce(0.01);
-    this.player.setScale(0.4, 0.4)
+    this.player.setScale(playerScale, playerScale)
     this.player.setDepth(100)
     this.player.body.setSize(this.player.width - 100, this.player.height - 50).setOffset(50, 25);
 
     // ====================== background =============================
-    // const backgroundImage = this.add.image(0, 0, "clouds").setOrigin(0, 0);
-    // backgroundImage.setScale(2, 0.8);
-    // backgroundImage.setScrollFactor(0.4)
     const bgScale = 1
     
-    let bg_layer1 = this.add.image(0, 0, 'Layer 1').setOrigin(0, 0)
+    const bgXIndent = 0
+    const bgYIndent = 0
+    
+    let bg_layer1 = this.add.image(bgXIndent, bgYIndent, 'Layer 1').setOrigin(0, 0)
     let bg_layer2 = this.add.image(0, 0, 'Layer 2').setOrigin(0, 0)
     let bg_layer3 = this.add.image(0, 0, 'Layer 3').setOrigin(0, 0)
     let bg_layer4 = this.add.image(0, 0, 'Layer 4').setOrigin(0, 0)
@@ -739,6 +741,8 @@ class GamePlay extends Phaser.Scene {
     bg_layer2.setScrollFactor(0.2)
     bg_layer1.setScrollFactor(0.1)
 
+    bg_layer4.setDepth(101)
+    
     // this.add.tileSprite(game.config.width/2, game.config.height/2, game.config.width, 3000, "kowhaiwhai").setScrollFactor(0.1, 0).setAlpha(0.2).setScale(1);
 
     // ====================== map =============================
@@ -868,7 +872,7 @@ class GamePlay extends Phaser.Scene {
       immovable: true
     });
 
-    // detail
+    // detail  
     //    var detailObjs = map.getObjectLayer("Detail")["objects"];
     //   detailObjs.forEach(detailObject => {
     //     switch(detailObject.gid) {
