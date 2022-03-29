@@ -4,7 +4,7 @@ let game;
 window.onload = function () {
   const gameConfig = {
     type: Phaser.AUTO,
-    backgroundColor: 0x444444,
+    backgroundColor: 0xb7cc1c,
     parent: "game",
     scale: {
       // mode: Phaser.Scale.FIT,
@@ -46,6 +46,13 @@ var completedGreenMission = false
 var completedYellowMission = false
 var completedRedMission = false
 
+// GLOBAL GAME VARIABLES
+let redCageKeyCollected = false
+let greenCageKeyCollected = false
+let yellowCageKeyCollected = false
+let redCageOpened = false
+let greenCageOpened = false
+let yellowCageOpened = false
 
 /* ======================
     GAME INTRO SCENE
@@ -610,7 +617,9 @@ class GamePlay extends Phaser.Scene {
     this.load.image("lockBlue", "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2FlockBlue.png?v=1609637921863");
     this.load.image("lockGreen", "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2FlockGreen.png?v=1609637921863");
     this.load.image("lockYellow", "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2FlockYellow.png?v=1609637922248");
-    
+    this.load.image("kiwiCage", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/cage.png?v=1648393812074")
+    this.load.image("kiwi", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/kiwi_idle.png?v=1648539380455")
+
     this.load.image('Layer 1', 'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/Layer%201.png?v=1648355031363')
     this.load.image('Layer 2', 'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/Layer%202.png?v=1648355106217')
     this.load.image('Layer 3', 'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/Layer%203.png?v=1648355112261')
@@ -667,7 +676,7 @@ class GamePlay extends Phaser.Scene {
     // this.load.tilemapTiledJSON("map", "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Ftest-map-2.5.json?v=1600815304381");
         
     // OLIONI'S MAP
-        this.load.tilemapTiledJSON("map", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/olioni-map-1_1.json?v=1648203198599")
+        this.load.tilemapTiledJSON("map", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/olioni-map-1_2.json?v=1648551762192")
     
     // ====================== Sound effects ===========================
         // this.load.audio("jump", "assets/sfx/phaseJump1.wav");
@@ -700,6 +709,11 @@ class GamePlay extends Phaser.Scene {
   }
 
   create() {
+    // ====================== map =============================
+    const map = this.make.tilemap({
+      key: "map"
+    });
+
     this.sound.stopAll()
     // load song
     const musicConfig = {
@@ -713,96 +727,81 @@ class GamePlay extends Phaser.Scene {
     // ====================== PLAYER =============================
     
     const playerScale = 1.4
-    
-    this.player = this.physics.add.sprite(50, 100, "taneIdle");
+    const playerYIndent = -930
+
+    const spawnIndent = 0.4
+
+    let spawnX = 0
+    let spawnY = 0
+
+    const spawn = map.findObject("Spawn", obj => {
+      spawnX = obj.x
+      spawnY = obj.y
+      return obj
+    })
+
+    // console.log(spawn)
+    console.log(spawnX, spawnY)
+
+    this.player = this.physics.add.sprite(spawnX * spawnIndent, (spawnY * spawnIndent) + playerYIndent, "taneIdle");
     this.player.setBounce(0.01);
     this.player.setScale(playerScale, playerScale)
-    this.player.setDepth(100)
+    this.player.setDepth(1000)
     this.player.body.setSize(this.player.width - 100, this.player.height - 50).setOffset(50, 25);
 
     // ====================== background =============================
-    const bgScale = 1.1
-    
+    const bgScale = 1.2
+    const treeScale = 1.3
+
     const bgXIndent = 0
     const bgYIndent = 0
     
-    let bg_layer1 = this.add.image(bgXIndent, bgYIndent, 'Layer 1').setOrigin(0, 0)
-    let bg_layer2 = this.add.image(bgXIndent, bgYIndent, 'Layer 2').setOrigin(0, 0)
-    let bg_layer3 = this.add.image(bgXIndent, bgYIndent, 'Layer 3').setOrigin(0, 0)
-    let bg_layer4 = this.add.image(bgXIndent, bgYIndent, 'Layer 4').setOrigin(0, 0)
+    let bg_layer1 = this.add.image(bgXIndent, bgYIndent, 'Layer 1').setOrigin(0, 0) // BACKGROUND IMAGE LAYER
+    let bg_layer2 = this.add.image(bgXIndent, bgYIndent, 'Layer 2').setOrigin(0, 0) // BACK TREES LAYER
+    let bg_layer3 = this.add.image(bgXIndent, bgYIndent, 'Layer 3').setOrigin(0, 0) // DARK GREEN GRASS LAYER
+    let bg_layer4 = this.add.image(bgXIndent, bgYIndent, 'Layer 4').setOrigin(0, 0) // TREE LAYER
     
-    bg_layer4.setScale(bgScale)
+    bg_layer4.setScale(treeScale)
     bg_layer3.setScale(bgScale)
     bg_layer2.setScale(bgScale)
     bg_layer1.setScale(bgScale)
     
-    bg_layer4.setScrollFactor(0.4)
+    bg_layer4.setScrollFactor(1)
     bg_layer3.setScrollFactor(0.3)
     bg_layer2.setScrollFactor(0.2)
     bg_layer1.setScrollFactor(0.1)
-
-    bg_layer4.setDepth(101)
+    bg_layer4.setDepth(1000)
     
     // this.add.tileSprite(game.config.width/2, game.config.height/2, game.config.width, 3000, "kowhaiwhai").setScrollFactor(0.1, 0).setAlpha(0.2).setScale(1);
-
-    // ====================== map =============================
-    const map = this.make.tilemap({
-      key: "map"
-    });
 
     // ====================== tilesets =============================
     const groundTileset = map.addTilesetImage("spritesheet_ground", "ground");
     const detailTiles = map.addTilesetImage("spritesheet_tiles", "tiles");
+    const cageTiles = map.addTilesetImage("cage", "kiwiCage");
 
     // ====================== get the level rectangle =============================
-    // const level1Rec = map.findObject("levels", obj => obj.name === "level1");
-    // console.log(level1Rec.width)
-    // console.log(level1Rec.height)
+    // -- NOT NEEDED --
+    // const level1Rec = map.findObject("Platforms");
+    // console.log(map)
+    // console.log(map.width)
+    // console.log(map.height)
 
     // ====================== world physics =============================
-    // this.physics.world.bounds.width = level1Rec.width*0.25;
-    // this.physics.world.bounds.height = level1Rec.height*0.25;
-    // this.player.setCollideWorldBounds(true);
+    this.physics.world.bounds.width = map.widthInPixels
+    this.physics.world.bounds.height = map.heightInPixels
+    // this.player.setCollideWorldBounds(true)
 
     // ====================== Camera ======================
-    // this.cameras.main.setViewport(0, 0, level1Rec.width/2, level1Rec.height/2);
-    // this.cameras.main.setBounds(level1Rec.x, level1Rec.y, level1Rec.width*0.25, level1Rec.height*0.25, true);
+    // this.cameras.main.setViewport(0, 0, map.widthInPixels, map.heightInPixels);
+    this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels*-0.25, true);
+    // console.log(map.widthInPixels, map.heightInPixels)
     // Set camera follow player
-    // this.cameras.main.startFollow(this.player);
+    this.cameras.main.startFollow(this.player);
     // Set camera fade in
-    // this.cameras.main.fadeIn(2000, 0, 0, 0);
-    // this.cameras.main.setZoom(2);
-    // this.cameras.main.setFollowOffset(0, 50);
+    this.cameras.main.fadeIn(2000, 0, 0, 0);
+    // this.cameras.main.setZoom(1);
+    this.cameras.main.setFollowOffset(0, 0.25);
 
-    // ====================== Animations ======================
-    this.anims.create({
-      key: "walk",
-      frames: this.anims.generateFrameNames("player", {
-        prefix: "robo_player_",
-        start: 2,
-        end: 3
-      }),
-      frameRate: 10,
-      repeat: -1
-    });
-
-    this.anims.create({
-      key: "idle",
-      frames: [{
-        key: "player",
-        frame: "robo_player_0"
-      }],
-      frameRate: 10
-    });
-
-    this.anims.create({
-      key: "jump",
-      frames: [{
-        key: "player",
-        frame: "robo_player_1"
-      }],
-      frameRate: 10
-    });
     // ========= TANE ANIMATIONS ===========
     this.anims.create({
       key: 'taneRun',
@@ -852,13 +851,13 @@ class GamePlay extends Phaser.Scene {
 
     const mapScale = 0.4
     const mapXIndent = 0
-    const mapYIndent = -900
+    const mapYIndent = playerYIndent
     
     //----- platforms
     const platforms = map.createLayer("Platforms", groundTileset, mapXIndent, mapYIndent).setOrigin(0, 0)
     const bridges = map.createLayer("Bridge", detailTiles, mapXIndent, mapYIndent).setOrigin(0, 0)
     const crates = map.createLayer("Crates", detailTiles, mapXIndent, mapYIndent).setOrigin(0, 0)
-    
+
     platforms.setCollisionByExclusion(-1, true);
     platforms.setScale(mapScale, mapScale);
     bridges.setCollisionByExclusion(-1, true);
@@ -877,41 +876,54 @@ class GamePlay extends Phaser.Scene {
       allowGravity: false,
       immovable: true
     });
-
+    this.cagesObjects = this.physics.add.group({
+      allowGravity: false,
+      immovable: true
+    })
+    this.kiwisObjects = this.physics.add.group({
+      allowGravity: false,
+      immovable: true
+    })
     // detail  
-    //    var detailObjs = map.getObjectLayer("Detail")["objects"];
-    //   detailObjs.forEach(detailObject => {
-    //     switch(detailObject.gid) {
-    //       case 228:
-    //          detail = this.badStuff.create(detailObject.x * 0.25, detailObject.y  * 0.25, 'chain').setScale(0.25, 0.25)
-    //         break;
-    //       case 131:
-    //          detail = this.badStuff.create(detailObject.x * 0.25, detailObject.y  * 0.25, 'cloud').setScale(0.25, 0.25)
-    //         break;
-    //       case 139:
-    //         detail = this.badStuff.create(detailObject.x * 0.25, (detailObject.y  * 0.25) - (detailObject.height *0.25), 'rock').setOrigin(0,0).setScale(0.25, 0.25)
-    //         break;
-    //       case 228:
-    //         detail = this.badStuff.create(detailObject.x * 0.25, detailObject.y  * 0.25, 'rock').setOrigin(0,0).setScale(0.25, 0.25)
-    //         break;
-    //       default:
-
-    //     }
-    //let detail = this.badStuff.create(lavaObject.x * 0.25, lavaObject.y  * 0.25, 'lavaSquare').setScale(0.25, 0.25)
+    // var detailObjs = map.getObjectLayer("Detail")["objects"];
+    // detailObjs.forEach(detailObject => {
+    //   switch(detailObject.gid) {
+    //     case 228:
+    //         detail = this.badStuff.create(detailObject.x * 0.25, detailObject.y  * 0.25, 'chain').setScale(0.25, 0.25)
+    //       break;
+    //     case 131:
+    //         detail = this.badStuff.create(detailObject.x * 0.25, detailObject.y  * 0.25, 'cloud').setScale(0.25, 0.25)
+    //       break;
+    //     case 139:
+    //       detail = this.badStuff.create(detailObject.x * 0.25, (detailObject.y  * 0.25) - (detailObject.height *0.25), 'rock').setOrigin(0,0).setScale(0.25, 0.25)
+    //       break;
+    //     case 228:
+    //       detail = this.badStuff.create(detailObject.x * 0.25, detailObject.y  * 0.25, 'rock').setOrigin(0,0).setScale(0.25, 0.25)
+    //       break;
+    //     default:
+    //   }
+    
+    // let detail = this.badStuff.create(lavaObject.x * 0.25, lavaObject.y  * 0.25, 'lavaSquare').setScale(0.25, 0.25)
     //   console.log(detailObject.gid)
     // });
 
     // objects from map
-    var spikesObjs = map.createFromObjects('Spikes', 250, {
-      key: 'spike'
-    });
+    // var spikesObjs = map.createFromObjects('Spikes', 250, {
+    //   key: 'spike'
+    // });
     // var bridgeObjs = map.createFromObjects('Bridge', 133, {
     //   key: 'spike'
     // });
     // var greenLockObjs = map.createFromObjects('greenDoor', 219, {
     //   key: 'lockGreen'
     // });
-
+    var cagesObjs = map.createFromObjects('Cages', {
+      key: 'kiwiCage',
+    });
+    var kiwiObjs = map.createFromObjects('Birds', {
+      key: 'kiwi'
+    })
+    
     // console.log('lavaObjs',lavaObjs)
     // console.log('spikesObjs',spikesObjs)
     // console.log("Bridge")
@@ -952,25 +964,44 @@ class GamePlay extends Phaser.Scene {
     //   this.physics.add.overlap(this.player, greenLock, this.tryOpenLock, null, this);
     // });
 
+    // ----- Bird Cages
+    cagesObjs.forEach(cageObj => {
+      let cage = this.cagesObjects.create(cageObj.x * mapScale, (cageObj.y * mapScale) + mapYIndent, 'kiwiCage').setOrigin(0, 0).setScale(mapScale, mapScale)
+      cage.name = cageObj.name
+      cage.type = cageObj.type
+      cage.setDepth(201)
+      // console.log(cage)
+      // this.physics.add.overlap(this.player, cage, this.touchingCage, null, this)
+    })
+    // this.cagesObjects
+
+    // ----- Kiwis
+    kiwiObjs.forEach(kiwiObj => {
+      let kiwi = this.kiwisObjects.create(kiwiObj.x * mapScale, (kiwiObj.y * mapScale) + mapYIndent, 'kiwi').setOrigin(0, 0).setScale(mapScale, mapScale)
+      kiwi.name = kiwiObj.name
+      kiwi.type = kiwiObj.type
+      kiwi.setDepth(200)
+    })
+
     // other functions to get objects
     // let Bridge = map.getObjectLayer("Bridge")["objects"];
     // map.findObject("Bridge", obj => obj.name == "bridge");
 
     //----- Spikes
-    let normalSpikes = [];
+    // let normalSpikes = [];
     // let rotatedSpikes = [];
-    map.findObject("Spikes", obj => {
-      if (obj.flippedVertical == true) {
-        console.log('vertical spikes found')
-      } else {
-        normalSpikes.push(obj)
-      }
-    })
-    normalSpikes.forEach(spikeObject => {
-      let spike = this.badStuff.create(spikeObject.x * 0.25, spikeObject.y * 0.25, 'spike').setOrigin(0, 1).setScale(0.25, 0.25)
-      spike.body.setSize(spike.width, spike.height - 60).setOffset(0, 60);
-      this.physics.add.collider(this.player, spike, this.playerHit, null, this);
-    });
+    // map.findObject("Spikes", obj => {
+    //   if (obj.flippedVertical == true) {
+    //     console.log('vertical spikes found')
+    //   } else {
+    //     normalSpikes.push(obj)
+    //   }
+    // })
+    // normalSpikes.forEach(spikeObject => {
+    //   let spike = this.badStuff.create(spikeObject.x * 0.25, spikeObject.y * 0.25, 'spike').setOrigin(0, 1).setScale(0.25, 0.25)
+    //   spike.body.setSize(spike.width, spike.height - 60).setOffset(0, 60);
+    //   this.physics.add.collider(this.player, spike, this.playerHit, null, this);
+    // });
     // rotatedSpikes.forEach(spikeObject => {
     //   let spike = this.badStuff.create(spikeObject.x * 0.25, spikeObject.y * 0.25, 'spike').setOrigin(0, 1).setScale(0.25, 0.25).setFlipY(true)
     //   spike.body.setSize(spike.width, spike.height - 60).setOffset(0, -5);
@@ -1022,11 +1053,15 @@ class GamePlay extends Phaser.Scene {
     // this.physics.add.overlap(this.player, greenKey, this.handleGotKey, null, this);
     // this.physics.add.overlap(this.player, redKey, this.handleGotKey, null, this);
     // this.physics.add.collider(this.player, this.levelObjects);
+    this.physics.add.overlap(this.player, this.cagesObjects, this.touchingCage, null, this)
+    this.physics.add.overlap(this.player, this.kiwisObjects)
+    // this.physics.add.overlap(this.player, this.cages, this.touchingCage, null, this)
 
   }
   //   Game Play Update (this is updating all the time)
   update() {
-    
+    // console.log(this.player.x, this.player.y)
+
     const playerJump = -250
     const playerVelocity = 200
     
@@ -1172,8 +1207,15 @@ class GamePlay extends Phaser.Scene {
     }
   }
 
+    // ================ open lock function ========================
   reachedExit(player, exit) {
     this.scene.start('game-win')
+  }
+  
+  // ===== CHECK CAGE FUNCTION =====
+  touchingCage(player, cage) {
+    console.log('touching cage:', cage.name)
+    console.log('cage', cage.name, 'opened?', )
   }
 }
 
