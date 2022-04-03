@@ -748,7 +748,8 @@ class GamePlay extends Phaser.Scene {
       "lockGreen",
       "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2FlockGreen.png?v=1609637921863"
     );
-    this.load.image("lockYellow",
+    this.load.image(
+      "lockYellow",
       "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2FlockYellow.png?v=1609637922248"
     );
     this.load.image(
@@ -849,13 +850,6 @@ class GamePlay extends Phaser.Scene {
       "map",
       "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/olioni-map-1_3.json?v=1648871977923"
     ); // latest TILED map
-    
-    // pa ian test map
-    this.load.tilemapTiledJSON(
-      "map",
-      "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/testmap.json?v=1649027537705"
-    ); // latest TILED map
-    
 
     // ====================== Sound effects ===========================
     // this.load.audio("jump", "assets/sfx/phaseJump1.wav");
@@ -921,8 +915,8 @@ class GamePlay extends Phaser.Scene {
     // console.log(spawn)
     console.log(spawnX, spawnY);
 
-    this.player = this.physics.add.sprite(spawnX, spawnY, "taneIdle");
-    // this.player = this.physics.add.sprite(100, 0, "taneIdle");
+    // this.player = this.physics.add.sprite(spawnX, spawnY, "taneIdle");
+    this.player = this.physics.add.sprite(0, 50, "taneIdle");
     this.player.setBounce(0.01);
     this.player.setScale(playerScale, playerScale);
     this.player.setDepth(1000);
@@ -932,19 +926,16 @@ class GamePlay extends Phaser.Scene {
     this.player.setFlipX(true);
 
     // ====================== background =============================
-    const bgScale = 3;
+    const bgScale = 1.2;
     const treeScale = 1.3;
 
     const bgXIndent = 0;
-    const bgYIndent = map.heightInPixels - 1200; // because layer height is 400px and scale is x3 (400x3=1200)
+    const bgYIndent = map.heightInPixels;
 
-    
-    // let bg_layer1 = this.add.image(bgXIndent, bgYIndent, "Layer 1") // BACKGROUND IMAGE LAYER
-    // bg_layer1.setOrigin(0);
-    // bg_layer1.setScale(3);
-    // bg_layer1.setScrollFactor(0.5,1);
-    
-    // bg_layer1.displayHeight = map.heightInPixels  // -> stretchs image to full height. prob not a bad idea if we know the scale. recommend change height of tiled map to 1200pixels as our bg_layers are 400px height so we know scale is 3x
+    let bg_layer1 = this.add.image(bgXIndent, map.heightInPixels - 800, "Layer 1").setOrigin(0, 0); // BACKGROUND IMAGE LAYER
+    // bg_layer1.setScale(2);
+    // bg_layer1.setScrollFactor(0.9,1.1);
+    // bg_layer1.displayHeight = map.heightInPixels  // -> stretchs image to full height. prob not a bad idea if we know the scale. recommend change height of tiled map
     
     // let bg_layer2 = this.add
     //   .image(bgXIndent, bgYIndent, "Layer 2")
@@ -952,11 +943,9 @@ class GamePlay extends Phaser.Scene {
     // let bg_layer3 = this.add
     //   .image(bgXIndent, bgYIndent, "Layer 3")
     //   .setOrigin(0, 0); // DARK GREEN GRASS LAYER
-    let bg_layer4 = this.add
-      .image(bgXIndent, 0, "Layer 4")
-      .setOrigin(0, 0); // TREE LAYER
-      bg_layer4.displayHeight = map.heightInPixels
-    bg_layer4.displayWidth = map.widthInPixels
+    // let bg_layer4 = this.add
+    //   .image(bgXIndent, bgYIndent, "Layer 4")
+    //   .setOrigin(0, 0); // TREE LAYER
 
     // bg_layer4.setScale(treeScale);
     // bg_layer3.setScale(bgScale);
@@ -998,9 +987,9 @@ class GamePlay extends Phaser.Scene {
     // this.cameras.main.setViewport(0, 0, map.widthInPixels, map.heightInPixels);
     this.cameras.main.setBounds(
       0,
-      map.heightInPixels - 1200,
+      0,
       map.widthInPixels,
-      1200,
+      map.heightInPixels,
       true
     );
     console.log(map.widthInPixels, map.heightInPixels);
