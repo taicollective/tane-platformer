@@ -748,8 +748,7 @@ class GamePlay extends Phaser.Scene {
       "lockGreen",
       "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2FlockGreen.png?v=1609637921863"
     );
-    this.load.image(
-      "lockYellow",
+    this.load.image("lockYellow",
       "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2FlockYellow.png?v=1609637922248"
     );
     this.load.image(
@@ -850,6 +849,13 @@ class GamePlay extends Phaser.Scene {
       "map",
       "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/olioni-map-1_3.json?v=1648871977923"
     ); // latest TILED map
+    
+    // pa ian test map
+    this.load.tilemapTiledJSON(
+      "map",
+      "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/testmap.json?v=1649027537705"
+    ); // latest TILED map
+    
 
     // ====================== Sound effects ===========================
     // this.load.audio("jump", "assets/sfx/phaseJump1.wav");
@@ -947,8 +953,10 @@ class GamePlay extends Phaser.Scene {
     //   .image(bgXIndent, bgYIndent, "Layer 3")
     //   .setOrigin(0, 0); // DARK GREEN GRASS LAYER
     let bg_layer4 = this.add
-      .image(bgXIndent, map.heightInPixels - 400, "Layer 4")
+      .image(bgXIndent, 0, "Layer 4")
       .setOrigin(0, 0); // TREE LAYER
+      bg_layer4.displayHeight = map.heightInPixels
+    bg_layer4.displayWidth = map.widthInPixels
 
     // bg_layer4.setScale(treeScale);
     // bg_layer3.setScale(bgScale);
