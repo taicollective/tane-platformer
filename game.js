@@ -915,7 +915,8 @@ class GamePlay extends Phaser.Scene {
     // console.log(spawn)
     console.log(spawnX, spawnY);
 
-    this.player = this.physics.add.sprite(spawnX, spawnY, "taneIdle");
+    // this.player = this.physics.add.sprite(spawnX, spawnY, "taneIdle");
+    this.player = this.physics.add.sprite(0, 50, "taneIdle");
     this.player.setBounce(0.01);
     this.player.setScale(playerScale, playerScale);
     this.player.setDepth(1000);
@@ -931,8 +932,9 @@ class GamePlay extends Phaser.Scene {
     const bgXIndent = 0;
     const bgYIndent = map.heightInPixels;
 
-    let bg_layer1 = this.add.image(bgXIndent, 200, "Layer 1").setOrigin(0, 0); // BACKGROUND IMAGE LAYER
-    // bg_layer1.setY(map.heightInPixels - bg_layer1.height);
+    let bg_layer1 = this.add.image(bgXIndent, map.heightInPixels - 800, "Layer 1").setOrigin(0, 0); // BACKGROUND IMAGE LAYER
+    bg_layer1.setScale(2);
+    bg_layer1.setScrollFactor(0.9,1.1);
     
     // let bg_layer2 = this.add
     //   .image(bgXIndent, bgYIndent, "Layer 2")
@@ -947,12 +949,12 @@ class GamePlay extends Phaser.Scene {
     // bg_layer4.setScale(treeScale);
     // bg_layer3.setScale(bgScale);
     // bg_layer2.setScale(bgScale);
-    // bg_layer1.setScale(bgScale);
+    
 
     // bg_layer4.setScrollFactor(1);
     // bg_layer3.setScrollFactor(0.3);
     // bg_layer2.setScrollFactor(0.2);
-    bg_layer1.setScrollFactor(0.1);
+    // bg_layer1.setScrollFactor(0.1);
     // bg_layer4.setDepth(1000);
 
     // this.add.tileSprite(game.config.width/2, game.config.height/2, game.config.width, 3000, "kowhaiwhai").setScrollFactor(0.1, 0).setAlpha(0.2).setScale(1);
