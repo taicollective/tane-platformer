@@ -916,7 +916,7 @@ class GamePlay extends Phaser.Scene {
     console.log(spawnX, spawnY);
 
     // this.player = this.physics.add.sprite(spawnX, spawnY, "taneIdle");
-    this.player = this.physics.add.sprite(0, 50, "taneIdle");
+    this.player = this.physics.add.sprite(100, 0, "taneIdle");
     this.player.setBounce(0.01);
     this.player.setScale(playerScale, playerScale);
     this.player.setDepth(1000);
@@ -933,8 +933,10 @@ class GamePlay extends Phaser.Scene {
     const bgYIndent = map.heightInPixels;
 
     let bg_layer1 = this.add.image(bgXIndent, map.heightInPixels - 800, "Layer 1").setOrigin(0, 0); // BACKGROUND IMAGE LAYER
-    bg_layer1.setScale(2);
-    bg_layer1.setScrollFactor(0.9,1.1);
+    // bg_layer1.setScale(2);
+    bg_layer1.setScrollFactor(1,0.9);
+    
+    // bg_layer1.displayHeight = map.heightInPixels  // -> stretchs image to full height. prob not a bad idea if we know the scale. recommend change height of tiled map to 1200pixels as our bg_layers are 400px height so we know scale is 3x
     
     // let bg_layer2 = this.add
     //   .image(bgXIndent, bgYIndent, "Layer 2")
