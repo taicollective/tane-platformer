@@ -666,7 +666,7 @@ class GamePlay extends Phaser.Scene {
         
     // OLIONI'S MAP
         // this.load.tilemapTiledJSON("map", "map/olioni-map.json")
-        this.load.tilemapTiledJSON("map", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/olioni-map.json?v=1649057169752")
+        this.load.tilemapTiledJSON("map", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/olioni-map.json?v=1649062631049")
     
     // ====================== Sound effects ===========================
         // this.load.audio("jump", "assets/sfx/phaseJump1.wav");
@@ -713,33 +713,6 @@ class GamePlay extends Phaser.Scene {
     }
     this.music = this.sound.add("music", musicConfig);
     // this.music.play();
-   
-    // ====================== PLAYER =============================
-    
-    const playerScale = 1.4
-    const playerYIndent = -930
-
-    const spawnIndent = 0.4
-
-    let spawnX = 0
-    let spawnY = 0
-
-    const spawn = map.findObject("Spawn", obj => {
-      spawnX = obj.x
-      spawnY = obj.y
-      return obj
-    })
-
-    // console.log(spawn)
-    console.log("map",map.widthInPixels, map.heightInPixels)
-    console.log("spawn",spawnX, spawnY)
-
-    this.player = this.physics.add.sprite(spawnX * spawnIndent, (spawnY * spawnIndent) + playerYIndent, "taneIdle");
-    this.player.setBounce(0.01);
-    this.player.setScale(playerScale, playerScale)
-    this.player.setDepth(1000)
-    this.player.body.setSize(this.player.width - 100, this.player.height - 50).setOffset(50, 25);
-    this.player.setFlipX(true);
 
     // ====================== background =============================
     const bgScale = 2
@@ -751,19 +724,19 @@ class GamePlay extends Phaser.Scene {
     let bg_layer1 = this.add.image(bgXIndent, bgYIndent, 'Layer 1').setOrigin(0, 0) // BACKGROUND IMAGE LAYER
     let bg_layer2 = this.add.image(bgXIndent, bgYIndent, 'Layer 2').setOrigin(0, 0) // BACK TREES LAYER
     let bg_layer3 = this.add.image(bgXIndent, bgYIndent, 'Layer 3').setOrigin(0, 0) // DARK GREEN GRASS LAYER
-    let bg_layer4 = this.add.image(bgXIndent, bgYIndent-2, 'Layer 4').setOrigin(0, 0) // TREE LAYER
+    let bg_layer4 = this.add.image(bgXIndent, -70    , 'Layer 4').setOrigin(0, 0) // TREE LAYER
     
-    bg_layer4.setScale(treeScale)
+    bg_layer4.setScale(1.8,3)
     bg_layer3.setScale(bgScale)
     bg_layer2.setScale(bgScale)
     bg_layer1.setScale(bgScale)
     
-    bg_layer4.setScrollFactor(1.3)
-    bg_layer3.setScrollFactor(0.3)
+    bg_layer4.setScrollFactor(1.2,0.9)
+    bg_layer3.setScrollFactor(0.5,0.3)
     bg_layer2.setScrollFactor(0.2)
     bg_layer1.setScrollFactor(0.1)
     bg_layer4.setDepth(1000)
-    
+    console.log('bg_layer4.widthInPixels',bg_layer4);
     // this.add.tileSprite(game.config.width/2, game.config.height/2, game.config.width, 3000, "kowhaiwhai").setScrollFactor(0.1, 0).setAlpha(0.2).setScale(1);
 
     // ====================== tilesets =============================
@@ -771,14 +744,58 @@ class GamePlay extends Phaser.Scene {
     const detailTiles = map.addTilesetImage("spritesheet_tiles", "tiles");
     const cageTiles = map.addTilesetImage("cage", "kiwiCage");
 
+    // ====================== MAP LAYERS =============================
+
+    const mapScale = 0.4
+    const mapXIndent = 0
+    const mapYIndent = -230 
+    
+    //----- platforms
+    const platforms = map.createLayer("Platforms", groundTileset, mapXIndent, mapYIndent).setOrigin(0, 0)
+    const bridges = map.createLayer("Bridge", detailTiles, mapXIndent, mapYIndent).setOrigin(0, 0)
+    const crates = map.createLayer("Crates", detailTiles, mapXIndent, mapYIndent).setOrigin(0, 0)
+
+    platforms.setCollisionByExclusion(-1, true);
+    platforms.setScale(mapScale, mapScale);
+    bridges.setCollisionByExclusion(-1, true);
+    bridges.setScale(mapScale, mapScale);
+    crates.setCollisionByExclusion(-1, true)
+    crates.setScale(mapScale, mapScale)
+
     // ====================== world physics =============================
     this.physics.world.bounds.width = map.widthInPixels
     this.physics.world.bounds.height = map.heightInPixels
     // this.player.setCollideWorldBounds(true)
+   
+    // ====================== PLAYER =============================
+
+    const playerScale = 1.4
+    const spawnIndent = 0.4
+
+    let spawnX = 0
+    let spawnY = 0
+    const spawn = map.findObject("Spawn", obj => {
+      spawnX = obj.x
+      spawnY = obj.y
+      return obj
+    })
+
+    // console.log(spawn)
+    console.log("map",map.widthInPixels, map.heightInPixels)
+    console.log("spawn",spawnX, spawnY)
+
+    this.player = this.physics.add.sprite(spawnX * spawnIndent, (spawnY * spawnIndent) + mapYIndent, "taneIdle");
+    this.player.setBounce(0.01);
+    this.player.setScale(playerScale, playerScale)
+    this.player.setDepth(1000)
+    this.player.body.setSize(this.player.width - 100, this.player.height - 50).setOffset(50, 25);
+    this.player.setFlipX(true);
+    this.player.setDepth(500)
 
     // ====================== Camera ======================
     // this.cameras.main.setViewport(0, 0, map.widthInPixels, map.heightInPixels);
-    this.cameras.main.setBounds(0, 0, 4000, map.heightInPixels*-0.25, true);
+    console.log("map.heightInPixels*-0.25",map.heightInPixels*-0.25);
+    this.cameras.main.setBounds(0, 0, 7000, 1200, true);
     // console.log(map.widthInPixels, map.heightInPixels)
     // Set camera follow player
     this.cameras.main.startFollow(this.player);
@@ -793,7 +810,7 @@ class GamePlay extends Phaser.Scene {
       frames: this.anims.generateFrameNumbers('taneRun', {
         frames: [16, 17, 18, 19, 20, 21, 22, 23]
       }),
-      frameRate: 10,
+      frameRate: 15,
       repeat: -1
     });
 
@@ -848,26 +865,10 @@ class GamePlay extends Phaser.Scene {
     // ====================== Controls ======================
     this.cursors = this.input.keyboard.createCursorKeys();
 
-    // ====================== MAP LAYERS =============================
 
-    const mapScale = 0.4
-    const mapXIndent = 0
-    const mapYIndent = playerYIndent
-    
-    //----- platforms
-    const platforms = map.createLayer("Platforms", groundTileset, mapXIndent, mapYIndent).setOrigin(0, 0)
-    const bridges = map.createLayer("Bridge", detailTiles, mapXIndent, mapYIndent).setOrigin(0, 0)
-    const crates = map.createLayer("Crates", detailTiles, mapXIndent, mapYIndent).setOrigin(0, 0)
 
-    platforms.setCollisionByExclusion(-1, true);
-    platforms.setScale(mapScale, mapScale);
-    bridges.setCollisionByExclusion(-1, true);
-    bridges.setScale(mapScale, mapScale);
-    crates.setCollisionByExclusion(-1, true)
-    crates.setScale(mapScale, mapScale)
 
-    //----- object layers
-
+    // ====================== Object Layers =============================
     // groups
     this.badStuff = this.physics.add.group({
       allowGravity: false,
@@ -907,7 +908,7 @@ class GamePlay extends Phaser.Scene {
     // ----- Kiwis
     kiwiObjs.forEach(kiwiObj => {
       let kiwi = this.kiwisObjects.create(kiwiObj.x * mapScale, (kiwiObj.y * mapScale) + mapYIndent, 'kiwi').setOrigin(0, 0).setScale(0.5, 0.5)
-      kiwi.body.setSize(kiwi.width-30, kiwi.height - 50).setOffset(0, 25);
+      kiwi.body.setSize(kiwi.width-30, kiwi.height - 50).setOffset(0, 13);
       this.physics.add.collider(kiwi, platforms);
       this.physics.add.collider(kiwi, bridges);
       this.physics.add.collider(kiwi, crates);
@@ -921,7 +922,6 @@ class GamePlay extends Phaser.Scene {
     // let Bridge = map.getObjectLayer("Bridge")["objects"];
     // map.findObject("Bridge", obj => obj.name == "bridge");
 
-
     // ====================== Colliders ======================
     this.physics.add.collider(this.player, platforms);
     this.physics.add.collider(this.player, bridges);
@@ -929,9 +929,6 @@ class GamePlay extends Phaser.Scene {
 
     
     //----- Key colliders/actions
-    // this.physics.add.overlap(this.player, yellowKey, this.handleGotKey, null, this);
-    // this.physics.add.overlap(this.player, greenKey, this.handleGotKey, null, this);
-    // this.physics.add.overlap(this.player, redKey, this.handleGotKey, null, this);
     // this.physics.add.collider(this.player, this.levelObjects);
     this.physics.add.overlap(this.player, this.cagesObjects, this.touchingCage, null, this)
     this.physics.add.overlap(this.player, this.kiwisObjects, this.touchingKiwi,null,this)
@@ -942,8 +939,8 @@ class GamePlay extends Phaser.Scene {
   update() {
     // console.log(this.player.x, this.player.y )
 
-    const playerJump = -250
-    const playerVelocity = 200
+    const playerJump = -300
+    const playerVelocity = 350
     
     // Control the player with left or right keys
     if (this.cursors.left.isDown) {
