@@ -19,7 +19,7 @@ window.onload = function () {
         gravity: {
           y: 400
         },
-        debug: false
+        debug: true
       }
     },
     // 5 DIFFERENT SCENES
@@ -617,7 +617,6 @@ class GamePlay extends Phaser.Scene {
 
     // TANE !!! (From Ariki Creative)
     this.load.spritesheet('taneIdle',
-
       'https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Ftane-idle.png?v=1606611069685', {
         frameWidth: 128,
         frameHeight: 128
@@ -650,9 +649,23 @@ class GamePlay extends Phaser.Scene {
       }
     );
 
+    this.load.spritesheet('kiwiIdle',
+    'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/kiwi-idle.png?v=1649057443589', {
+      frameWidth: 128,
+      frameHeight: 108
+    })
+
+    this.load.spritesheet('kiwiRun',
+    'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/kiwi-walk.png?v=1649059409627', {
+      frameWidth: 128,
+      frameHeight: 128
+    }
+  );
+
     // ====================== Tiled JSON map ===========================
         
     // OLIONI'S MAP
+        // this.load.tilemapTiledJSON("map", "map/olioni-map.json")
         this.load.tilemapTiledJSON("map", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/olioni-map.json?v=1649057169752")
     
     // ====================== Sound effects ===========================
@@ -726,6 +739,7 @@ class GamePlay extends Phaser.Scene {
     this.player.setScale(playerScale, playerScale)
     this.player.setDepth(1000)
     this.player.body.setSize(this.player.width - 100, this.player.height - 50).setOffset(50, 25);
+    this.player.setFlipX(true);
 
     // ====================== background =============================
     const bgScale = 2
@@ -815,6 +829,22 @@ class GamePlay extends Phaser.Scene {
       frameRate: 10,
     });
 
+    this.anims.create({
+      key: 'kiwiIdle',
+      frames: this.anims.generateFrameNumbers('kiwiIdle', {
+        frames: [0, 1, 2, 3, 4,5,6,7]
+      }),
+      frameRate: 3,
+      repeat: -1
+    });
+
+    this.anims.create({
+      key: 'kiwiRun',
+      frames: 'kiwiRun',
+      frameRate: 10,
+      repeat: -1
+    });
+
     // ====================== Controls ======================
     this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -852,8 +882,8 @@ class GamePlay extends Phaser.Scene {
       immovable: true
     })
     this.kiwisObjects = this.physics.add.group({
-      allowGravity: false,
-      immovable: true
+      allowGravity: true,
+      immovable: false
     })
 
     var cagesObjs = map.createFromObjects('Cages', {
@@ -876,10 +906,15 @@ class GamePlay extends Phaser.Scene {
 
     // ----- Kiwis
     kiwiObjs.forEach(kiwiObj => {
-      let kiwi = this.kiwisObjects.create(kiwiObj.x * mapScale, (kiwiObj.y * mapScale) + mapYIndent, 'kiwi').setOrigin(0, 0).setScale(mapScale, mapScale)
+      let kiwi = this.kiwisObjects.create(kiwiObj.x * mapScale, (kiwiObj.y * mapScale) + mapYIndent, 'kiwi').setOrigin(0, 0).setScale(0.5, 0.5)
+      kiwi.body.setSize(kiwi.width-30, kiwi.height - 50).setOffset(0, 25);
+      this.physics.add.collider(kiwi, platforms);
+      this.physics.add.collider(kiwi, bridges);
+      this.physics.add.collider(kiwi, crates);
       kiwi.name = kiwiObj.name
       kiwi.type = kiwiObj.type
       kiwi.setDepth(200)
+      kiwi.play('kiwiIdle', true);
     })
 
     // other functions to get objects
@@ -891,6 +926,7 @@ class GamePlay extends Phaser.Scene {
     this.physics.add.collider(this.player, platforms);
     this.physics.add.collider(this.player, bridges);
     this.physics.add.collider(this.player, crates);
+
     
     //----- Key colliders/actions
     // this.physics.add.overlap(this.player, yellowKey, this.handleGotKey, null, this);
@@ -898,7 +934,7 @@ class GamePlay extends Phaser.Scene {
     // this.physics.add.overlap(this.player, redKey, this.handleGotKey, null, this);
     // this.physics.add.collider(this.player, this.levelObjects);
     this.physics.add.overlap(this.player, this.cagesObjects, this.touchingCage, null, this)
-    this.physics.add.overlap(this.player, this.kiwisObjects)
+    this.physics.add.overlap(this.player, this.kiwisObjects, this.touchingKiwi,null,this)
     // this.physics.add.overlap(this.player, this.cages, this.touchingCage, null, this)
 
   }
@@ -942,7 +978,7 @@ class GamePlay extends Phaser.Scene {
       this.jumptimer = 1;
       this.player.body.velocity.y = playerJump;
       this.player.play('taneJump', false);
-      this.sound.play("jump"); 
+      // this.sound.play("jump"); 
     } else if (this.cursors.space.isDown && (this.jumptimer != 0)) {
       //player is no longer on the ground, but is still holding the jump key
       if (this.jumptimer > 30) { // player has been holding jump for over 30 frames, it's time to stop him
@@ -1058,8 +1094,13 @@ class GamePlay extends Phaser.Scene {
   
   // ===== CHECK CAGE FUNCTION =====
   touchingCage(player, cage) {
-    console.log('touching cage:', cage.name)
-    console.log('cage', cage.name, 'opened?', )
+    cage.destroy()
+  }
+  touchingKiwi(player, kiwi) {
+    console.log("go kiwi")
+    kiwi.setVelocityX(-200)
+    kiwi.play('kiwiRun', true);
+
   }
 }
 
