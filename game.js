@@ -841,15 +841,15 @@ class GamePlay extends Phaser.Scene {
     // this.load.tilemapTiledJSON("map", "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Ftest-map-2.4.json?v=1600219625072")
     // this.load.tilemapTiledJSON("map", "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Ftest-map-2.5.json?v=1600815304381" );
     // this.load.tilemapTiledJSON("map", "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fcage-map.json?v=1606610896966" );
-    // this.load.tilemapTiledJSON("map", "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fcage-map-latest.json?v=1609829241643");
+    this.load.tilemapTiledJSON("map", "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fcage-map-latest.json?v=1609829241643");
     // this.load.tilemapTiledJSON("map", "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Ftest-map-2.5.json?v=1600815304381");
 
     // OLIONI'S MAP
     // this.load.tilemapTiledJSON("map", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/olioni-map-1_2.json?v=1648551762192") // link to glitch asset
-    this.load.tilemapTiledJSON(
-      "map",
-      "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/olioni-map-1_3.json?v=1648871977923"
-    ); // latest TILED map
+    // this.load.tilemapTiledJSON(
+    //   "map",
+    //   "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/olioni-map-1_3.json?v=1648871977923"
+    // ); // latest TILED map
 
     // ====================== Sound effects ===========================
     // this.load.audio("jump", "assets/sfx/phaseJump1.wav");
@@ -916,7 +916,7 @@ class GamePlay extends Phaser.Scene {
     console.log(spawnX, spawnY);
 
     // this.player = this.physics.add.sprite(spawnX, spawnY, "taneIdle");
-    this.player = this.physics.add.sprite(0, 50, "taneIdle");
+    this.player = this.physics.add.sprite(100, 50, "taneIdle");
     this.player.setBounce(0.01);
     this.player.setScale(playerScale, playerScale);
     this.player.setDepth(1000);
@@ -975,7 +975,7 @@ class GamePlay extends Phaser.Scene {
     // ====================== world physics =============================
     this.physics.world.bounds.width = map.widthInPixels;
     this.physics.world.bounds.height = map.heightInPixels;
-    // this.player.setCollideWorldBounds(true)
+    this.player.setCollideWorldBounds(true)
 
     console.log(
       "world physics boundaries",
@@ -1047,7 +1047,7 @@ class GamePlay extends Phaser.Scene {
 
     // ====================== MAP LAYERS =============================
 
-    const mapScale = 0.5;
+    const mapScale = 0.25;
     const mapXOffset = 0;
     const mapYOffset = map.heightInPixels * mapScale;
 
@@ -1055,19 +1055,19 @@ class GamePlay extends Phaser.Scene {
     const platforms = map
       .createLayer("Platforms", groundTileset, 0, mapYOffset)
       .setOrigin(0, 0);
-    const bridges = map
-      .createLayer("Bridge", detailTiles, 0, mapYOffset)
-      .setOrigin(0, 0);
-    const crates = map
-      .createLayer("Crates", detailTiles, 0, mapYOffset)
-      .setOrigin(0, 0);
+    // const bridges = map
+    //   .createLayer("Bridge", detailTiles, 0, mapYOffset)
+    //   .setOrigin(0, 0);
+    // const crates = map
+    //   .createLayer("Crates", detailTiles, 0, mapYOffset)
+    //   .setOrigin(0, 0);
 
     platforms.setCollisionByExclusion(-1, true);
     platforms.setScale(mapScale, mapScale);
-    bridges.setCollisionByExclusion(-1, true);
-    bridges.setScale(mapScale, mapScale);
-    crates.setCollisionByExclusion(-1, true);
-    crates.setScale(mapScale, mapScale);
+    // bridges.setCollisionByExclusion(-1, true);
+    // bridges.setScale(mapScale, mapScale);
+    // crates.setCollisionByExclusion(-1, true);
+    // crates.setScale(mapScale, mapScale);
 
     //----- object layers
 
