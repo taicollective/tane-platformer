@@ -1,4 +1,2 @@
 TO DO LIST FOR THE GAME:
-- Collect multiple tools to unlock cage
-- Sort out object placements on the game
-- Fix the background layers 
+- Collect multiple "tools" to unlock cage
