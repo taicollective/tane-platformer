@@ -28,7 +28,7 @@ window.onload = function () {
       GamePlay,
       // GameOver, 
       // GameWin, 
-      // GameHud,
+      GameHud,
       ]
   };
   // new game bruh
@@ -385,61 +385,32 @@ class GameHud extends Phaser.Scene {
     super("game-hud");
   }
   init() {
+    // timer starting time
     this.countdownTime = 60
   }
   // Game hud preload
   preload() {
-    this.load.audio(
-      "cheer",
-      "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fcheer.wav?v=1609829231162"
-    );
 
-    // token types
-    this.load.image(
-      "green-token-type",
-      "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Ftane-green-token.png?v=1609829228862"
-    );
-    this.load.image(
-      "yellow-token-type",
-      "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Ftane-yellow-token.png?v=1609829228207"
-    );
-    this.load.image(
-      "red-token-type",
-      "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Ftane-red-token.png?v=1609829227986"
-    );
+    // fire/mauri hud
+    this.load.spritesheet('mauri1',
+    'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/fire2_64.png?v=1649479618044', {
+      frameWidth: 64,
+      frameHeight: 64
+    })
+    this.load.spritesheet('mauri2',
+    'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/fire6_64.png?v=1649479618111', {
+      frameWidth: 64,
+      frameHeight: 64
+    })
+    this.load.spritesheet('mauri3',
+    'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/fire7_64.png?v=1649479618218', {
+      frameWidth: 64,
+      frameHeight: 64
+    })
+   
 
-    this.load.image(
-      "green-token-overlay",
-      "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fgreen-overlay.png?v=1609829230044"
-    );
-    this.load.image(
-      "yellow-token-overlay",
-      "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fyellow-overlay.png?v=1609829229357"
-    );
-    this.load.image(
-      "red-token-overlay",
-      "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fred-overlay.png?v=1609829536466"
-    );
+    this.load.image('fire', 'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/blue-fire.png?v=1649480738676')
 
-    this.load.image(
-      "green-token-tab",
-      "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fgreen-tab.png?v=1609829227708"
-    );
-    this.load.image(
-      "yellow-token-tab",
-      "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fyellow-tab.png?v=1609829223274"
-    );
-    this.load.image(
-      "red-token-tab",
-      "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fred-tab.png?v=1609829226737"
-    );
-
-    // hand
-    this.load.image(
-      "hand",
-      "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fhand.png?v=1609829226281"
-    );
-    
      //  Load the Google WebFont Loader script
      this.load.script(
       "webfont",
@@ -479,79 +450,47 @@ class GameHud extends Phaser.Scene {
       }
     });
 
-    // ========== TOKEN METERS
-    // GREEN token type
-    // the token container. A simple sprite
-    let tokenGreen = this.add
-      .sprite(60, 50, "green-token-type")
-      .setScrollFactor(0).setScale(0.2).setDepth(100)
-    tokenGreenOverlay = this.add
-      .sprite(60, 50, "green-token-overlay")
-      .setScrollFactor(0).setScale(0.2).setDepth(150)
-    // create a group for the gold tab
-    tokenGreenTabGroup = this.add.group()
-    const tokenGreenTab = this.add.sprite(110, 50, "green-token-tab").setScrollFactor(0).setScale(0.2).setDepth(99)
-    const tokenGreenHand = this.add.sprite(130, 50, "hand").setScrollFactor(0).setScale(0.12).setDepth(99)
-    tokenGreenTabGroup.addMultiple([tokenGreenTab, tokenGreenHand])
-    // hand animation
-    this.tweens.add({
-      targets: tokenGreenHand,
-      x: 125,
-      duration: 500,
-      ease: 'Back.easeIn ',
-      yoyo: true,
-      loop: -1
+    // ========= MAURI ANIMATIONS ===========
+    this.anims.create({
+      key: 'mauri1Anim',
+      frames: 'mauri1',
+      frameRate: 15,
+      repeat: -1
     });
-    tokenGreenTabGroup.children.each(entity => entity.flipX = true)
-    // tokenGreenTabGroup.toggleVisible()
+    this.anims.create({
+      key: 'mauri2Anim',
+      frames: 'mauri2',
+      frameRate: 15,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'mauri3Anim',
+      frames: 'mauri3',
+      frameRate: 15,
+      repeat: -1
+    });
+ 
 
-    // YELLOW token type
-    let tokenYellow = this.add
-      .sprite(60, 150, "yellow-token-type")
-      .setScrollFactor(0).setScale(0.2).setDepth(100)
-    tokenYellowOverlay = this.add
-      .sprite(60, 150, "yellow-token-overlay")
-      .setScrollFactor(0).setScale(0.2).setDepth(150)
-    // create a group for the gold tab
-    tokenYellowTabGroup = this.add.group()
-    const tokenYellowTab = this.add.sprite(110, 150, "yellow-token-tab").setScrollFactor(0).setScale(0.2).setDepth(99)
-    const tokenYellowHand = this.add.sprite(130, 150, "hand").setScrollFactor(0).setScale(0.12).setDepth(99)
-    tokenYellowTabGroup.addMultiple([tokenYellowTab, tokenYellowHand])
-    // hand animation
-    this.tweens.add({
-      targets: tokenYellowHand,
-      x: 125,
-      duration: 500,
-      ease: 'Back.easeIn ',
-      yoyo: true,
-      loop: -1
-    });
-    tokenYellowTabGroup.children.each(entity => entity.flipX = true)
-    tokenYellowTabGroup.toggleVisible()
+    // ========== MAURI METERS
+    // Mauri 1
+    let mauri1 = this.add
+      .sprite(50, 50, "fire")
+      .setScrollFactor(0).setScale(2).setDepth(100)
+      mauri1.play("mauri1Anim",true)
+    // Mauri 2
+    let mauri2 = this.add
+      .sprite(150, 50, "fire")
+      .setScrollFactor(0).setScale(2).setDepth(100)
+      mauri2.play("mauri2Anim",true)
+    // Mauri 3
+    let mauri3 = this.add
+      .sprite(250, 50, "fire")
+      .setScrollFactor(0).setScale(2).setDepth(100)
+      mauri3.play("mauri3Anim",true)
 
-    // RED token type
-    let tokenRed = this.add
-      .sprite(60, 250, "red-token-type")
-      .setScrollFactor(0).setScale(0.2).setDepth(100)
-    tokenRedOverlay = this.add
-      .sprite(60, 250, "red-token-overlay")
-      .setScrollFactor(0).setScale(0.2).setDepth(150)
-    // create a group for the red tab
-    tokenRedTabGroup = this.add.group()
-    const tokenRedTab = this.add.sprite(110, 250, "red-token-tab").setScrollFactor(0).setScale(0.2).setDepth(99)
-    const tokenRedHand = this.add.sprite(130, 250, "hand").setScrollFactor(0).setScale(0.12).setDepth(99)
-    tokenRedTabGroup.addMultiple([tokenRedTab, tokenRedHand])
-    // hand animation
-    this.tweens.add({
-      targets: tokenRedHand,
-      x: 125,
-      duration: 500,
-      ease: 'Back.easeIn ',
-      yoyo: true,
-      loop: -1
-    });
-    tokenRedTabGroup.children.each(entity => entity.flipX = true)
-    tokenRedTabGroup.toggleVisible()
+
+
+   
   }
 
 
@@ -608,10 +547,13 @@ class GamePlay extends Phaser.Scene {
     this.load.image('Layer 3', 'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/Layer%203.png?v=1648355112261')
     this.load.image('Layer 4', 'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/Layer%204.png?v=1648355125295')
 
-    this.load.image('mauri1', 'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/fire2_64.png?v=1649479618044')
-    this.load.image('mauri2', 'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/fire6_64.png?v=1649479618111')
-    this.load.image('mauri3', 'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/fire7_64.png?v=1649479618218')
-    
+    this.load.spritesheet('magic',
+    'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/1_magicspell_spritesheet.png?v=1649481473924', {
+      frameWidth: 192,
+      frameHeight: 192
+    })
+
+
     // this.load.image(
     //   "kowhaiwhai",
     //   "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fkowhaiwhai.png?v=1609829230478"
@@ -739,7 +681,7 @@ class GamePlay extends Phaser.Scene {
     bg_layer3.setScrollFactor(0.5,0.3)
     bg_layer2.setScrollFactor(0.2)
     bg_layer1.setScrollFactor(0.1)
-    bg_layer4.setDepth(1000)
+    bg_layer4.setDepth(1002)
     console.log('bg_layer4.widthInPixels',bg_layer4);
     // this.add.tileSprite(game.config.width/2, game.config.height/2, game.config.width, 3000, "kowhaiwhai").setScrollFactor(0.1, 0).setAlpha(0.2).setScale(1);
 
@@ -866,6 +808,13 @@ class GamePlay extends Phaser.Scene {
       repeat: -1
     });
 
+    // magic anim
+    this.anims.create({
+      key: 'magicAnim',
+      frames: 'magic',
+      frameRate: 15,
+    });
+
     // ====================== Controls ======================
     this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -890,6 +839,13 @@ class GamePlay extends Phaser.Scene {
       allowGravity: true,
       immovable: false
     })
+    this.playerMauriObjects = this.physics.add.group({
+      allowGravity: false,
+      immovable: false
+    })
+
+    // mauri
+    this.mauri = this.playerMauriObjects.create(0,0,'magic').setOrigin(0,0).setDepth(1001).setVisible(false)
 
     var cagesObjs = map.createFromObjects('Cages', {
       key: 'kiwiCage',
@@ -905,7 +861,8 @@ class GamePlay extends Phaser.Scene {
       cage.type = cageObj.type
       cage.setDepth(201)
       // console.log(cage)
-      // this.physics.add.overlap(this.player, cage, this.touchingCage, null, this)
+      const cageCollider = this.physics.add.overlap(this.player, cage, this.touchingCage, null, this)
+      cageCollider.name = cage.name
     })
     // this.cagesObjects
 
@@ -934,7 +891,7 @@ class GamePlay extends Phaser.Scene {
     
     //----- Key colliders/actions
     // this.physics.add.collider(this.player, this.levelObjects);
-    this.physics.add.overlap(this.player, this.cagesObjects, this.touchingCage, null, this)
+    // this.physics.add.overlap(this.player, this.cagesObjects, this.touchingCage, null, this)
     this.physics.add.overlap(this.player, this.kiwisObjects, this.touchingKiwi,null,this)
     // this.physics.add.overlap(this.player, this.cages, this.touchingCage, null, this)
 
@@ -942,6 +899,10 @@ class GamePlay extends Phaser.Scene {
   //   Game Play Update (this is updating all the time)
   update() {
     // console.log(this.player.x, this.player.y )
+
+    // Mauri follow player
+    this.mauri.x = this.player.x - this.mauri.width/2
+    this.mauri.y = this.player.y- this.mauri.height/2
 
     const playerJump = -300
     const playerVelocity = 350
@@ -1004,6 +965,8 @@ class GamePlay extends Phaser.Scene {
     }
     // log player x y location
     // console.log(Math.round(this.player.x), Math.round(this.player.y))
+
+
   }
   
   // Other custom game functions
@@ -1095,10 +1058,20 @@ class GamePlay extends Phaser.Scene {
   
   // ===== CHECK CAGE FUNCTION =====
   touchingCage(player, cage) {
+    const cageCollider = this.physics.world.colliders.getActive().find(function(i){
+      return i.name == cage.name
+    })
+    console.log("cageCollider",cageCollider)
+    cageCollider.active = false
+    this.mauri.setVisible(true)
+    this.mauri.play("magicAnim",false)
     cage.destroy()
   }
   touchingKiwi(player, kiwi) {
     console.log("go kiwi")
+    console.log("play magic")
+    // Magic 1
+      
     kiwi.setVelocityX(-200)
     kiwi.play('kiwiRun', true);
 
