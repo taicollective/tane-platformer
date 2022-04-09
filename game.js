@@ -607,6 +607,10 @@ class GamePlay extends Phaser.Scene {
     this.load.image('Layer 2', 'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/Layer%202.png?v=1648355106217')
     this.load.image('Layer 3', 'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/Layer%203.png?v=1648355112261')
     this.load.image('Layer 4', 'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/Layer%204.png?v=1648355125295')
+
+    this.load.image('mauri1', 'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/fire2_64.png?v=1649479618044')
+    this.load.image('mauri2', 'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/fire6_64.png?v=1649479618111')
+    this.load.image('mauri3', 'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/fire7_64.png?v=1649479618218')
     
     // this.load.image(
     //   "kowhaiwhai",
