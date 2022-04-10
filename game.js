@@ -469,27 +469,6 @@ class GameHud extends Phaser.Scene {
       frameRate: 15,
       repeat: -1
     });
- 
-
-    // ========== MAURI METERS
-    // Mauri 1
-    let mauri1 = this.add
-      .sprite(50, 50, "fire")
-      .setScrollFactor(0).setScale(2).setDepth(100)
-      mauri1.play("mauri1Anim",true)
-    // Mauri 2
-    let mauri2 = this.add
-      .sprite(150, 50, "fire")
-      .setScrollFactor(0).setScale(2).setDepth(100)
-      mauri2.play("mauri2Anim",true)
-    // Mauri 3
-    let mauri3 = this.add
-      .sprite(250, 50, "fire")
-      .setScrollFactor(0).setScale(2).setDepth(100)
-      mauri3.play("mauri3Anim",true)
-
-
-
    
   }
 
@@ -612,7 +591,7 @@ class GamePlay extends Phaser.Scene {
         
     // OLIONI'S MAP
         // this.load.tilemapTiledJSON("map", "map/olioni-map.json")
-        this.load.tilemapTiledJSON("map", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/olioni-map.json?v=1649062631049")
+        this.load.tilemapTiledJSON("map", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/olioni-map.json?v=1649560380387")
     
     // ====================== Sound effects ===========================
         // this.load.audio("jump", "assets/sfx/phaseJump1.wav");
@@ -814,6 +793,28 @@ class GamePlay extends Phaser.Scene {
       frames: 'magic',
       frameRate: 15,
     });
+
+
+    // ========= Mauri flame HUD
+    this.mauriLayer = this.add.layer().setDepth(1005);
+    this.hudX = 0
+
+
+    //     // ========== MAURI METERS
+    // // Mauri 1
+    // this.mauri1 = this.add
+    //   .sprite(50, 50, "fire")
+    //   .setScrollFactor(0).setScale(2).setDepth(1003)
+    //   this.mauri1.play("mauri1Anim",true)
+
+    // // ========== MAURI METERS MASKS
+    // this.maskMauri1 = this.make.graphics();
+    // this.maskMauri1.fillStyle(0xffffff);
+    // this.maskMauri1.fillRect(this.mauri1.x - (this.mauri1.width/2),this.mauri1.height+50, this.mauri1.width,this.mauri1.height+50).setScrollFactor(0).setDepth(1005);
+
+    // const mask = this.maskMauri1.createGeometryMask()
+    // mauriLayer.setMask(mask)
+    // mauriLayer.add(this.mauri1)
 
     // ====================== Controls ======================
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -1058,23 +1059,52 @@ class GamePlay extends Phaser.Scene {
   
   // ===== CHECK CAGE FUNCTION =====
   touchingCage(player, cage) {
+    // remove cage collider
     const cageCollider = this.physics.world.colliders.getActive().find(function(i){
       return i.name == cage.name
     })
-    console.log("cageCollider",cageCollider)
     cageCollider.active = false
+    // show tane mauri animation
     this.mauri.setVisible(true)
     this.mauri.play("magicAnim",false)
+    // add mauri flame
+    this.addMauriFlame()
+
+    // destroy cage
     cage.destroy()
+
   }
+
   touchingKiwi(player, kiwi) {
-    console.log("go kiwi")
-    console.log("play magic")
-    // Magic 1
-      
     kiwi.setVelocityX(-200)
     kiwi.play('kiwiRun', true);
 
+  }
+
+  addMauriFlame() {
+    this.hudX += 70
+    // add blue flame
+    const mauriFlame = this.add
+      .sprite(this.hudX, 50, "fire")
+      .setScrollFactor(0).setScale(2).setDepth(1003)
+    mauriFlame.play("mauri1Anim",true)
+
+  //   // add rectangle mask
+  //   const maskMauriFlame = this.make.graphics();
+  //   maskMauriFlame.fillStyle(0xffffff);
+  //   maskMauriFlame.fillRect(mauriFlame.x - (mauriFlame.width/2),mauriFlame.height+50, mauriFlame.width,mauriFlame.height+50).setScrollFactor(0).setDepth(1005);
+
+  //   // add mask to mauri layer
+  //   const mask = maskMauriFlame.createGeometryMask()
+  //   this.mauriLayer.setMask(mask)
+  //   this.mauriLayer.add(mauriFlame)
+  
+  //   // tween hud flame reveal
+  //   const tween = this.tweens.add({
+  //     targets: maskMauriFlame,
+  //     y: -120,
+  //     duration: 1000
+  // });
   }
 }
 
