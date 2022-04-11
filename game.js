@@ -47,12 +47,24 @@ var completedYellowMission = false
 var completedRedMission = false
 
 // GLOBAL GAME VARIABLES
-let redCageKeyCollected = false
-let greenCageKeyCollected = false
-let yellowCageKeyCollected = false
-let redCageOpened = false
-let greenCageOpened = false
-let yellowCageOpened = false
+let taiahaObj = {
+  taiahaCollected: false,
+  partsCollected: {
+    taiahaHead: false,
+    taiahaTongue: false,
+    taiahaFront: false,
+    taiahaBack: false,
+  },
+  taiahaPartsCollected: 0,
+  totalTaiahaParts: 4
+}
+
+let tongueTaiaha, headTaiaha, frontTaiaha, backTaiaha = null
+
+let taiahaCollected = false
+let tally = null
+
+let gameHeight = ''
 
 /* ======================
     GAME INTRO SCENE
@@ -385,13 +397,12 @@ class GameHud extends Phaser.Scene {
     super("game-hud");
   }
   init() {
-    // timer starting time
-    this.countdownTime = 60
+    this.countdownTime = 120
+    this.totalTaiahaParts = 6
+    this.currentCoins = 0
   }
   // Game hud preload
   preload() {
-
-    // fire/mauri hud
     this.load.spritesheet('mauri1',
     'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/fire2_64.png?v=1649479618044', {
       frameWidth: 64,
@@ -407,15 +418,26 @@ class GameHud extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 64
     })
-   
 
     this.load.image('fire', 'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/blue-fire.png?v=1649480738676')
 
+    this.load.audio(
+      "cheer",
+      "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fcheer.wav?v=1609829231162"
+    );
+    
      //  Load the Google WebFont Loader script
      this.load.script(
       "webfont",
       "//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js"
     );
+
+    // Taiaha Parts for the HUD
+    this.load.image("grey-taiaha", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/grey%20taiaha.png?v=1649646899324")
+    this.load.image("tongue-taiaha", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/taiaha%20tongue.png?v=1649646916693")
+    this.load.image("head-taiaha", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/taiaha%20head.png?v=1649646913292")
+    this.load.image("front-taiaha", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/taiaha%20front.png?v=1649646907989")
+    this.load.image("back-taiaha", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/taiaha%20back.png?v=1649646905020")
 
   }
   // Game hud create
@@ -429,7 +451,7 @@ class GameHud extends Phaser.Scene {
       },
       active: () => {
         this.timer = this.add
-          .text(game.config.width / 2, 50, "Time: "+this.countdownTime, {
+          .text(game.config.width / 2, 50, "Time: " + this.countdownTime, {
             fontFamily: "Freckle Face",
             fontSize: 50,
             color: "#ffffff"
@@ -450,7 +472,23 @@ class GameHud extends Phaser.Scene {
       }
     });
 
-    // ========= MAURI ANIMATIONS ===========
+    WebFont.load({
+      google: {
+        families: ["Freckle Face", "Finger Paint", "Nosifer"]
+      },
+      active: () => {
+        tally = this.add.text(200, 50, "Parts Collected: " + taiahaObj.taiahaPartsCollected + "/" + taiahaObj.totalTaiahaParts, {
+          fontFamily: "Freckle Face",
+          fontSize: 40,
+          color: "#ffffff"
+        })
+        .setShadow(2, 2, "#333333", 2, false, true);
+        tally.setAlign("center")
+        tally.setOrigin()
+        
+      }
+    }); 
+
     this.anims.create({
       key: 'mauri1Anim',
       frames: 'mauri1',
@@ -469,7 +507,28 @@ class GameHud extends Phaser.Scene {
       frameRate: 15,
       repeat: -1
     });
-   
+
+    let taiahaScale = 0.4
+
+    let greyTaiaha = this.add.image(200, 80, 'grey-taiaha')
+    greyTaiaha.setScale(taiahaScale, taiahaScale)
+
+    tongueTaiaha = this.add.image(200, 80, 'tongue-taiaha')
+    tongueTaiaha.setScale(taiahaScale, taiahaScale)
+    tongueTaiaha.setVisible(false)
+
+    headTaiaha = this.add.image(200, 80, 'head-taiaha')
+    headTaiaha.setScale(taiahaScale, taiahaScale)
+    headTaiaha.setVisible(false)
+
+    frontTaiaha = this.add.image(200, 80, 'front-taiaha')
+    frontTaiaha.setScale(taiahaScale, taiahaScale)
+    frontTaiaha.setVisible(false)
+
+    backTaiaha = this.add.image(200, 80, 'back-taiaha')
+    backTaiaha.setScale(taiahaScale, taiahaScale)
+    backTaiaha.setVisible(false)
+
   }
 
 
@@ -526,17 +585,16 @@ class GamePlay extends Phaser.Scene {
     this.load.image('Layer 3', 'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/Layer%203.png?v=1648355112261')
     this.load.image('Layer 4', 'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/Layer%204.png?v=1648355125295')
 
+    this.load.image('taiaha-head-icon', "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/ICON%20taiaha%20head.png?v=1649647763222")
+    this.load.image('taiaha-tongue-icon', "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/ICON%20taiaha%20tongue.png?v=1649648105935")
+    this.load.image('taiaha-front-icon', "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/ICON%20taiaha%20front.png?v=1649648109045")
+    this.load.image('taiaha-back-icon', "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/ICON%20taiaha%20back.png?v=1649648115969")
+
     this.load.spritesheet('magic',
     'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/1_magicspell_spritesheet.png?v=1649481473924', {
       frameWidth: 192,
       frameHeight: 192
     })
-
-
-    // this.load.image(
-    //   "kowhaiwhai",
-    //   "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fkowhaiwhai.png?v=1609829230478"
-    // );
 
     // ====================== player (atlas) =============================
 
@@ -590,8 +648,7 @@ class GamePlay extends Phaser.Scene {
     // ====================== Tiled JSON map ===========================
         
     // OLIONI'S MAP
-        // this.load.tilemapTiledJSON("map", "map/olioni-map.json")
-        this.load.tilemapTiledJSON("map", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/olioni-map.json?v=1649560380387")
+        this.load.tilemapTiledJSON("map", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/olioni-map-2.json?v=1649674067727")
     
     // ====================== Sound effects ===========================
         // this.load.audio("jump", "assets/sfx/phaseJump1.wav");
@@ -629,6 +686,8 @@ class GamePlay extends Phaser.Scene {
       key: "map"
     });
 
+    gameHeight = map.heightInPixels
+
     this.sound.stopAll()
     // load song
     const musicConfig = {
@@ -659,8 +718,8 @@ class GamePlay extends Phaser.Scene {
     bg_layer4.setScrollFactor(1.2,0.9)
     bg_layer3.setScrollFactor(0.5,0.3)
     bg_layer2.setScrollFactor(0.2)
-    bg_layer1.setScrollFactor(0.1)
-    bg_layer4.setDepth(1002)
+    bg_layer1.setScrollFactor(0)
+    bg_layer4.setDepth(1000)
     console.log('bg_layer4.widthInPixels',bg_layer4);
     // this.add.tileSprite(game.config.width/2, game.config.height/2, game.config.width, 3000, "kowhaiwhai").setScrollFactor(0.1, 0).setAlpha(0.2).setScale(1);
 
@@ -787,40 +846,19 @@ class GamePlay extends Phaser.Scene {
       repeat: -1
     });
 
-    // magic anim
     this.anims.create({
       key: 'magicAnim',
       frames: 'magic',
       frameRate: 15,
     });
 
-
     // ========= Mauri flame HUD
     this.mauriLayer = this.add.layer().setDepth(1005);
-    this.hudX = 0
+    this.hudX = 750
 
-
-    //     // ========== MAURI METERS
-    // // Mauri 1
-    // this.mauri1 = this.add
-    //   .sprite(50, 50, "fire")
-    //   .setScrollFactor(0).setScale(2).setDepth(1003)
-    //   this.mauri1.play("mauri1Anim",true)
-
-    // // ========== MAURI METERS MASKS
-    // this.maskMauri1 = this.make.graphics();
-    // this.maskMauri1.fillStyle(0xffffff);
-    // this.maskMauri1.fillRect(this.mauri1.x - (this.mauri1.width/2),this.mauri1.height+50, this.mauri1.width,this.mauri1.height+50).setScrollFactor(0).setDepth(1005);
-
-    // const mask = this.maskMauri1.createGeometryMask()
-    // mauriLayer.setMask(mask)
-    // mauriLayer.add(this.mauri1)
 
     // ====================== Controls ======================
     this.cursors = this.input.keyboard.createCursorKeys();
-
-
-
 
     // ====================== Object Layers =============================
     // groups
@@ -840,12 +878,15 @@ class GamePlay extends Phaser.Scene {
       allowGravity: true,
       immovable: false
     })
+    this.taiahaObjects = this.physics.add.group({
+      allowGravity: false,
+      immovable: true
+    })
     this.playerMauriObjects = this.physics.add.group({
       allowGravity: false,
       immovable: false
     })
 
-    // mauri
     this.mauri = this.playerMauriObjects.create(0,0,'magic').setOrigin(0,0).setDepth(1001).setVisible(false)
 
     var cagesObjs = map.createFromObjects('Cages', {
@@ -853,6 +894,9 @@ class GamePlay extends Phaser.Scene {
     });
     var kiwiObjs = map.createFromObjects('Birds', {
       key: 'kiwi'
+    })
+    var taiahaObjs = map.createFromObjects('Tools', {
+      key: 'taiaha'
     })
     
     // ----- Bird Cages
@@ -863,7 +907,7 @@ class GamePlay extends Phaser.Scene {
       cage.setDepth(201)
       // console.log(cage)
       const cageCollider = this.physics.add.overlap(this.player, cage, this.touchingCage, null, this)
-      cageCollider.name = cage.name
+      cageCollider.name = cage.name 
     })
     // this.cagesObjects
 
@@ -880,6 +924,63 @@ class GamePlay extends Phaser.Scene {
       kiwi.play('kiwiIdle', true);
     })
 
+    taiahaObjs.forEach(taiahaObj => {
+      // let tool = this.taiahaObjects.create(toolObj.x * mapScale, (toolObj.y * mapScale) + mapYIndent, 'tool').setOrigin(0, 0).setScale(mapScale, mapScale)
+      // tool.name = toolObj.name
+      // tool.type = toolObj.type
+      
+      if (taiahaObj.name == 'head') {
+        let taiaha = this.taiahaObjects.create(taiahaObj.x * mapScale, (taiahaObj.y * mapScale) + mapYIndent, 'taiaha-head-icon').setOrigin(0, 0).setScale(mapScale, mapScale)
+        taiaha.name = taiahaObj.name
+        taiaha.type = taiahaObj.type
+        this.tweens.add({
+          targets: taiaha,
+          y: ((taiahaObj.y * mapScale) + mapYIndent) + 20,
+          duration: 2000,
+          ease: 'Sine.easeInOut',
+          repeat: -1,
+          yoyo: true
+        })
+      } else if (taiahaObj.name == 'tongue') {
+        let taiaha = this.taiahaObjects.create(taiahaObj.x * mapScale, (taiahaObj.y * mapScale) + mapYIndent, 'taiaha-tongue-icon').setOrigin(0, 0).setScale(mapScale, mapScale)
+        taiaha.name = taiahaObj.name
+        taiaha.type = taiahaObj.type
+        this.tweens.add({
+          targets: taiaha,
+          y: ((taiahaObj.y * mapScale) + mapYIndent) + 20,
+          duration: 2000,
+          ease: 'Sine.easeInOut',
+          repeat: -1,
+          yoyo: true
+        })
+      } else if (taiahaObj.name == 'front') {
+        let taiaha = this.taiahaObjects.create(taiahaObj.x * mapScale, (taiahaObj.y * mapScale) + mapYIndent, 'taiaha-front-icon').setOrigin(0, 0).setScale(mapScale, mapScale)
+        taiaha.name = taiahaObj.name
+        taiaha.type = taiahaObj.type
+        this.tweens.add({
+          targets: taiaha,
+          y: ((taiahaObj.y * mapScale) + mapYIndent) + 20,
+          duration: 2000,
+          ease: 'Sine.easeInOut',
+          repeat: -1,
+          yoyo: true
+        })
+      } else if (taiahaObj.name == 'back') {
+        let taiaha = this.taiahaObjects.create(taiahaObj.x * mapScale, (taiahaObj.y * mapScale) + mapYIndent, 'taiaha-back-icon').setOrigin(0, 0).setScale(mapScale, mapScale)
+        taiaha.name = taiahaObj.name
+        taiaha.type = taiahaObj.type
+        this.tweens.add({
+          targets: taiaha,
+          y: ((taiahaObj.y * mapScale) + mapYIndent) + 20,
+          duration: 2000,
+          ease: 'Sine.easeInOut',
+          repeat: -1,
+          yoyo: true
+        })
+      }
+
+    })
+
     // other functions to get objects
     // let Bridge = map.getObjectLayer("Bridge")["objects"];
     // map.findObject("Bridge", obj => obj.name == "bridge");
@@ -892,18 +993,14 @@ class GamePlay extends Phaser.Scene {
     
     //----- Key colliders/actions
     // this.physics.add.collider(this.player, this.levelObjects);
-    // this.physics.add.overlap(this.player, this.cagesObjects, this.touchingCage, null, this)
     this.physics.add.overlap(this.player, this.kiwisObjects, this.touchingKiwi,null,this)
+    this.physics.add.overlap(this.player, this.taiahaObjects, this.collectTaiaha, null, this)
     // this.physics.add.overlap(this.player, this.cages, this.touchingCage, null, this)
 
   }
   //   Game Play Update (this is updating all the time)
   update() {
     // console.log(this.player.x, this.player.y )
-
-    // Mauri follow player
-    this.mauri.x = this.player.x - this.mauri.width/2
-    this.mauri.y = this.player.y- this.mauri.height/2
 
     const playerJump = -300
     const playerVelocity = 350
@@ -930,12 +1027,6 @@ class GamePlay extends Phaser.Scene {
     }
 
     // Player can jump while walking any direction by pressing the space bar
-    // or the 'UP' arrow
-    // === JUMP
-    // if ((this.cursors.space.isDown || this.cursors.up.isDown ) && this.player.body.onFloor() ) {
-    //   this.player.setVelocityY(-350);
-    //   this.player.play('jump', true);
-    // }
     if (this.cursors.space.isDown && this.player.body.onFloor()) {
       //player is on the ground, so he is allowed to start a jump
       this.jumptimer = 1;
@@ -964,10 +1055,13 @@ class GamePlay extends Phaser.Scene {
       // otherwise, make them face the other side
       this.player.setFlipX(false);
     }
+
+    if (this.player.body.y >= gameHeight) {
+      console.log('player has fallen off the map')
+    } 
+
     // log player x y location
     // console.log(Math.round(this.player.x), Math.round(this.player.y))
-
-
   }
   
   // Other custom game functions
@@ -1059,28 +1153,49 @@ class GamePlay extends Phaser.Scene {
   
   // ===== CHECK CAGE FUNCTION =====
   touchingCage(player, cage) {
-    // remove cage collider
-    const cageCollider = this.physics.world.colliders.getActive().find(function(i){
-      return i.name == cage.name
-    })
-    cageCollider.active = false
-    // show tane mauri animation
-    this.mauri.setVisible(true)
-    this.mauri.play("magicAnim",false)
-    // add mauri flame
-    this.addMauriFlame()
+    if (taiahaObj.taiahaPartsCollected == 4 && taiahaObj.taiahaCollected == true) {
+      
+      const cageCollider = this.physics.world.colliders.getActive().find(function(i){
+        return i.name == cage.name
+      })
+      cageCollider.active = false
+      // show tane mauri animation
+      this.mauri.setVisible(true)
+      this.mauri.play("magicAnim",false)
+      // add mauri flame
+      this.addMauriFlame()
 
-    // destroy cage
-    cage.destroy()
-
+      cage.destroy()
+    }
   }
-
   touchingKiwi(player, kiwi) {
-    kiwi.setVelocityX(-200)
-    kiwi.play('kiwiRun', true);
-
+    if (taiahaObj.taiahaCollected == true) {
+      console.log("go kiwi")
+      kiwi.setVelocityX(-200)
+      kiwi.play('kiwiRun', true);
+    }
   }
+  collectTaiaha(player, taiaha) {
+    taiaha.destroy()
+    taiahaObj.taiahaPartsCollected += 1
 
+    if (taiaha.name == 'head') {
+      headTaiaha.setVisible(true)
+    } else if (taiaha.name == 'tongue') {
+      tongueTaiaha.setVisible(true)
+    } else if (taiaha.name == 'front') {
+      frontTaiaha.setVisible(true)
+    } else if (taiaha.name == 'back') {
+      backTaiaha.setVisible(true)
+    }
+
+    tally.setText("Parts Collected: " + taiahaObj.taiahaPartsCollected + "/" + taiahaObj.totalTaiahaParts)
+    
+    if (taiahaObj.taiahaPartsCollected == 4) {
+      console.log('ALL PARTS COLLECTED!')
+      taiahaObj.taiahaCollected = true
+    }
+  }
   addMauriFlame() {
     this.hudX += 70
     // add blue flame
@@ -1088,23 +1203,6 @@ class GamePlay extends Phaser.Scene {
       .sprite(this.hudX, 50, "fire")
       .setScrollFactor(0).setScale(2).setDepth(1003)
     mauriFlame.play("mauri1Anim",true)
-
-  //   // add rectangle mask
-  //   const maskMauriFlame = this.make.graphics();
-  //   maskMauriFlame.fillStyle(0xffffff);
-  //   maskMauriFlame.fillRect(mauriFlame.x - (mauriFlame.width/2),mauriFlame.height+50, mauriFlame.width,mauriFlame.height+50).setScrollFactor(0).setDepth(1005);
-
-  //   // add mask to mauri layer
-  //   const mask = maskMauriFlame.createGeometryMask()
-  //   this.mauriLayer.setMask(mask)
-  //   this.mauriLayer.add(mauriFlame)
-  
-  //   // tween hud flame reveal
-  //   const tween = this.tweens.add({
-  //     targets: maskMauriFlame,
-  //     y: -120,
-  //     duration: 1000
-  // });
   }
 }
 
