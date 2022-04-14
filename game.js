@@ -65,6 +65,11 @@ let taiahaCollected = false
 let tally = null
 
 let gameHeight = ''
+let countdownTime = 0
+
+let keyF = null
+
+let enemyVelocity = 100
 
 /* ======================
     GAME INTRO SCENE
@@ -397,7 +402,7 @@ class GameHud extends Phaser.Scene {
     super("game-hud");
   }
   init() {
-    this.countdownTime = 120
+    countdownTime = 120
     this.totalTaiahaParts = 6
     this.currentCoins = 0
   }
@@ -433,7 +438,7 @@ class GameHud extends Phaser.Scene {
     );
 
     // Taiaha Parts for the HUD
-    this.load.image("grey-taiaha", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/grey%20taiaha.png?v=1649646899324")
+    this.load.image("grey-taiaha", "images/HUD/grey taiaha 2.png")
     this.load.image("tongue-taiaha", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/taiaha%20tongue.png?v=1649646916693")
     this.load.image("head-taiaha", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/taiaha%20head.png?v=1649646913292")
     this.load.image("front-taiaha", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/taiaha%20front.png?v=1649646907989")
@@ -451,7 +456,7 @@ class GameHud extends Phaser.Scene {
       },
       active: () => {
         this.timer = this.add
-          .text(game.config.width / 2, 50, "Time: " + this.countdownTime, {
+          .text(game.config.width / 2, 50, "Time: " + countdownTime, {
             fontFamily: "Freckle Face",
             fontSize: 50,
             color: "#ffffff"
@@ -537,12 +542,12 @@ class GameHud extends Phaser.Scene {
     var add = this.add;
     var input = this.input;
 
-    if (this.countdownTime === 0) {
+    if (countdownTime === 0) {
       console.log("end");
       this.scene.start("game-over")
     } else {
-      this.countdownTime -= 1;
-      this.timer.setText("Time: " + this.countdownTime);
+      countdownTime -= 1;
+      this.timer.setText("Time: " + countdownTime);
     }
   }
 
@@ -589,6 +594,9 @@ class GamePlay extends Phaser.Scene {
     this.load.image('taiaha-tongue-icon', "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/ICON%20taiaha%20tongue.png?v=1649648105935")
     this.load.image('taiaha-front-icon', "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/ICON%20taiaha%20front.png?v=1649648109045")
     this.load.image('taiaha-back-icon', "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/ICON%20taiaha%20back.png?v=1649648115969")
+    this.load.image('taiaha-glow', "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/taiaha-glow.png?v=1649904081002")
+
+    this.load.image('enemy', "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/enemy.png?v=1649904103930")
 
     this.load.spritesheet('magic',
     'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/1_magicspell_spritesheet.png?v=1649481473924', {
@@ -648,7 +656,8 @@ class GamePlay extends Phaser.Scene {
     // ====================== Tiled JSON map ===========================
         
     // OLIONI'S MAP
-        this.load.tilemapTiledJSON("map", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/olioni-map-2.json?v=1649674067727")
+        this.load.tilemapTiledJSON("map", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/olioni-map-3.json?v=1649904206832")
+        // this.load.tilemapTiledJSON("map", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/olioni-map.json?v=1649062631049")
     
     // ====================== Sound effects ===========================
         // this.load.audio("jump", "assets/sfx/phaseJump1.wav");
@@ -715,11 +724,11 @@ class GamePlay extends Phaser.Scene {
     bg_layer2.setScale(bgScale)
     bg_layer1.setScale(bgScale)
     
-    bg_layer4.setScrollFactor(1.2,0.9)
+    bg_layer4.setScrollFactor(0.9,0.9)
     bg_layer3.setScrollFactor(0.5,0.3)
     bg_layer2.setScrollFactor(0.2)
     bg_layer1.setScrollFactor(0)
-    bg_layer4.setDepth(1000)
+    // bg_layer4.setDepth()
     console.log('bg_layer4.widthInPixels',bg_layer4);
     // this.add.tileSprite(game.config.width/2, game.config.height/2, game.config.width, 3000, "kowhaiwhai").setScrollFactor(0.1, 0).setAlpha(0.2).setScale(1);
 
@@ -862,14 +871,7 @@ class GamePlay extends Phaser.Scene {
 
     // ====================== Object Layers =============================
     // groups
-    this.badStuff = this.physics.add.group({
-      allowGravity: false,
-      immovable: true
-    });
-    this.levelObjects = this.physics.add.group({
-      allowGravity: false,
-      immovable: true
-    });
+
     this.cagesObjects = this.physics.add.group({
       allowGravity: false,
       immovable: true
@@ -886,6 +888,14 @@ class GamePlay extends Phaser.Scene {
       allowGravity: false,
       immovable: false
     })
+    this.enemyObjects = this.physics.add.group({
+      allowGravity: false,
+      immovable: true
+    })
+    this.taiahaGlowObjects = this.physics.add.group({
+      allowGravity: false,
+      immovable: true
+    })
 
     this.mauri = this.playerMauriObjects.create(0,0,'magic').setOrigin(0,0).setDepth(1001).setVisible(false)
 
@@ -898,7 +908,10 @@ class GamePlay extends Phaser.Scene {
     var taiahaObjs = map.createFromObjects('Tools', {
       key: 'taiaha'
     })
-    
+    var enemyObjs = map.createFromObjects('Enemies', {
+      key: 'enemy'
+    })
+
     // ----- Bird Cages
     cagesObjs.forEach(cageObj => {
       let cage = this.cagesObjects.create(cageObj.x * mapScale, (cageObj.y * mapScale) + mapYIndent, 'kiwiCage').setOrigin(0, 0).setScale(mapScale, mapScale)
@@ -924,15 +937,24 @@ class GamePlay extends Phaser.Scene {
       kiwi.play('kiwiIdle', true);
     })
 
+    let glowScale = 0.4
+
     taiahaObjs.forEach(taiahaObj => {
       // let tool = this.taiahaObjects.create(toolObj.x * mapScale, (toolObj.y * mapScale) + mapYIndent, 'tool').setOrigin(0, 0).setScale(mapScale, mapScale)
       // tool.name = toolObj.name
       // tool.type = toolObj.type
-      
+
       if (taiahaObj.name == 'head') {
         let taiaha = this.taiahaObjects.create(taiahaObj.x * mapScale, (taiahaObj.y * mapScale) + mapYIndent, 'taiaha-head-icon').setOrigin(0, 0).setScale(mapScale, mapScale)
         taiaha.name = taiahaObj.name
         taiaha.type = taiahaObj.type
+
+        let glow = this.taiahaGlowObjects.create(taiahaObj.x * mapScale, (taiahaObj.y * mapScale) + mapYIndent, 'taiaha-glow').setOrigin(0, 0).setScale(glowScale, glowScale)
+
+        taiaha.setDepth(401)
+        glow.setDepth(400)
+        glow.setAlpha(1)
+
         this.tweens.add({
           targets: taiaha,
           y: ((taiahaObj.y * mapScale) + mapYIndent) + 20,
@@ -941,12 +963,37 @@ class GamePlay extends Phaser.Scene {
           repeat: -1,
           yoyo: true
         })
+        this.tweens.add({
+          targets: glow,
+          y: ((taiahaObj.y * mapScale) + mapYIndent) + 20,
+          scale: mapScale + 0.1,
+          duration: 2000,
+          ease: 'Sine.easeInOut',
+          repeat: -1,
+          yoyo: true
+        })
+
       } else if (taiahaObj.name == 'tongue') {
         let taiaha = this.taiahaObjects.create(taiahaObj.x * mapScale, (taiahaObj.y * mapScale) + mapYIndent, 'taiaha-tongue-icon').setOrigin(0, 0).setScale(mapScale, mapScale)
         taiaha.name = taiahaObj.name
         taiaha.type = taiahaObj.type
+
+        let glow = this.taiahaGlowObjects.create(taiahaObj.x * mapScale, (taiahaObj.y * mapScale) + mapYIndent, 'taiaha-glow').setOrigin(0, 0).setScale(glowScale, glowScale)
+
+        taiaha.setDepth(401)
+        glow.setDepth(400)
+        glow.setAlpha(1)
+
         this.tweens.add({
           targets: taiaha,
+          y: ((taiahaObj.y * mapScale) + mapYIndent) + 20,
+          duration: 2000,
+          ease: 'Sine.easeInOut',
+          repeat: -1,
+          yoyo: true
+        })
+        this.tweens.add({
+          targets: glow,
           y: ((taiahaObj.y * mapScale) + mapYIndent) + 20,
           duration: 2000,
           ease: 'Sine.easeInOut',
@@ -957,8 +1004,23 @@ class GamePlay extends Phaser.Scene {
         let taiaha = this.taiahaObjects.create(taiahaObj.x * mapScale, (taiahaObj.y * mapScale) + mapYIndent, 'taiaha-front-icon').setOrigin(0, 0).setScale(mapScale, mapScale)
         taiaha.name = taiahaObj.name
         taiaha.type = taiahaObj.type
+
+        let glow = this.taiahaGlowObjects.create(taiahaObj.x * mapScale, (taiahaObj.y * mapScale) + mapYIndent, 'taiaha-glow').setOrigin(0, 0).setScale(glowScale, glowScale)
+
+        taiaha.setDepth(401)
+        glow.setDepth(400)
+        glow.setAlpha(1)
+
         this.tweens.add({
           targets: taiaha,
+          y: ((taiahaObj.y * mapScale) + mapYIndent) + 20,
+          duration: 2000,
+          ease: 'Sine.easeInOut',
+          repeat: -1,
+          yoyo: true
+        })
+        this.tweens.add({
+          targets: glow,
           y: ((taiahaObj.y * mapScale) + mapYIndent) + 20,
           duration: 2000,
           ease: 'Sine.easeInOut',
@@ -969,6 +1031,13 @@ class GamePlay extends Phaser.Scene {
         let taiaha = this.taiahaObjects.create(taiahaObj.x * mapScale, (taiahaObj.y * mapScale) + mapYIndent, 'taiaha-back-icon').setOrigin(0, 0).setScale(mapScale, mapScale)
         taiaha.name = taiahaObj.name
         taiaha.type = taiahaObj.type
+
+        let glow = this.taiahaGlowObjects.create(taiahaObj.x * mapScale, (taiahaObj.y * mapScale) + mapYIndent, 'taiaha-glow').setOrigin(0, 0).setScale(glowScale, glowScale)
+
+        taiaha.setDepth(401)
+        glow.setDepth(400)
+        glow.setAlpha(1)
+
         this.tweens.add({
           targets: taiaha,
           y: ((taiahaObj.y * mapScale) + mapYIndent) + 20,
@@ -977,8 +1046,23 @@ class GamePlay extends Phaser.Scene {
           repeat: -1,
           yoyo: true
         })
+        this.tweens.add({
+          targets: glow,
+          y: ((taiahaObj.y * mapScale) + mapYIndent) + 20,
+          scale: mapScale + 0.1,
+          duration: 2000,
+          ease: 'Sine.easeInOut',
+          repeat: -1,
+          yoyo: true
+        })
       }
 
+    })
+
+    enemyObjs.forEach(enemyObj => {
+      let enemy = this.enemyObjects.create(enemyObj.x * mapScale, (enemyObj.y * mapScale) + mapYIndent, 'enemy').setOrigin(0, 0).setScale(mapScale, mapScale)
+      enemy.name = enemyObj.name
+      enemy.type = enemyObj.type
     })
 
     // other functions to get objects
@@ -990,13 +1074,22 @@ class GamePlay extends Phaser.Scene {
     this.physics.add.collider(this.player, bridges);
     this.physics.add.collider(this.player, crates);
 
+    this.physics.add.collider(this.enemyObjects, platforms, this.enemyTouchingPlatforms, null, this)
+    this.physics.add.collider(this.enemyObjects, bridges)
+    this.physics.add.collider(this.enemyObjects, crates)
     
     //----- Key colliders/actions
     // this.physics.add.collider(this.player, this.levelObjects);
-    this.physics.add.overlap(this.player, this.kiwisObjects, this.touchingKiwi,null,this)
+    this.physics.add.overlap(this.player, this.kiwisObjects, this.touchingKiwi, null, this)
     this.physics.add.overlap(this.player, this.taiahaObjects, this.collectTaiaha, null, this)
-    // this.physics.add.overlap(this.player, this.cages, this.touchingCage, null, this)
+    this.physics.add.overlap(this.player, this.taiahaGlowObjects, this.touchingGlow, null, this)
+    this.physics.add.overlap(this.player, this.enemyObjects, this.touchingEnemy, null, this)
 
+    this.enemyObjects.setVelocityX(100)
+
+    keyF = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
+
+    this.playerAttacking = false
   }
   //   Game Play Update (this is updating all the time)
   update() {
@@ -1016,13 +1109,19 @@ class GamePlay extends Phaser.Scene {
       if (this.player.body.onFloor()) {
         this.player.play('taneRun', true);
       }
+    } else if (keyF.isDown) {
+      this.playerAttacking = true
+      this.player.play('taneAttack', false)
+      this.player.on('animationcomplete', () => {
+        this.playerAttacking = false
+      })
     } else {
       // If no keys are pressed, the player keeps still
       this.player.setVelocityX(0);
       // Only show the idle animation if the player is footed
       // If this is not included, the player would look idle while jumping
-      if (this.player.body.onFloor()) {
-        this.player.play('taneIdle', true);
+      if (this.player.body.onFloor() && this.playerAttacking == false) {
+        this.player.play('taneIdle', false);
       }
     }
 
@@ -1055,13 +1154,6 @@ class GamePlay extends Phaser.Scene {
       // otherwise, make them face the other side
       this.player.setFlipX(false);
     }
-
-    if (this.player.body.y >= gameHeight) {
-      console.log('player has fallen off the map')
-    } 
-
-    // log player x y location
-    // console.log(Math.round(this.player.x), Math.round(this.player.y))
   }
   
   // Other custom game functions
@@ -1154,25 +1246,28 @@ class GamePlay extends Phaser.Scene {
   // ===== CHECK CAGE FUNCTION =====
   touchingCage(player, cage) {
     if (taiahaObj.taiahaPartsCollected == 4 && taiahaObj.taiahaCollected == true) {
-      
-      const cageCollider = this.physics.world.colliders.getActive().find(function(i){
-        return i.name == cage.name
-      })
-      cageCollider.active = false
-      // show tane mauri animation
-      this.mauri.setVisible(true)
-      this.mauri.play("magicAnim",false)
-      // add mauri flame
-      this.addMauriFlame()
+      if (keyF.isDown) {
+        const cageCollider = this.physics.world.colliders.getActive().find(function(i){
+          return i.name == cage.name
+        })
+        cageCollider.active = false
+        // show tane mauri animation
+        this.mauri.setVisible(true)
+        this.mauri.play("magicAnim",false)
+        // add mauri flame
+        this.addMauriFlame()
 
-      cage.destroy()
+        cage.destroy()
+      }
     }
   }
   touchingKiwi(player, kiwi) {
     if (taiahaObj.taiahaCollected == true) {
-      console.log("go kiwi")
-      kiwi.setVelocityX(-200)
-      kiwi.play('kiwiRun', true);
+      if (keyF.isDown) {
+        console.log("go kiwi")
+        kiwi.setVelocityX(-200)
+        kiwi.play('kiwiRun', true);
+      }
     }
   }
   collectTaiaha(player, taiaha) {
@@ -1196,6 +1291,9 @@ class GamePlay extends Phaser.Scene {
       taiahaObj.taiahaCollected = true
     }
   }
+  touchingGlow(player, glow) {
+    glow.destroy()
+  }
   addMauriFlame() {
     this.hudX += 70
     // add blue flame
@@ -1204,6 +1302,20 @@ class GamePlay extends Phaser.Scene {
       .setScrollFactor(0).setScale(2).setDepth(1003)
     mauriFlame.play("mauri1Anim",true)
   }
+  enemyTouchingPlatforms(enemy, ground) {
+    // console.log(enemy)
+    if (enemy.body.blocked.right) {
+      // console.log('collision right')
+      enemy.body.velocity.x = -enemyVelocity
+    } else if (enemy.body.blocked.left) {
+      // console.log('collision left')
+      enemy.body.velocity.x = enemyVelocity
+    }
+  }
+  touchingEnemy(player, enemy) {
+
+  }
+  keyPressed() {
+    console.log('pressed')
+  }
 }
-
-
