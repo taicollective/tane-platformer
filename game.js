@@ -26,7 +26,7 @@ window.onload = function () {
     scene: [
       // GameIntro, 
       GamePlay,
-      // GameOver, 
+      GameOver, 
       // GameWin, 
       GameHud,
       ]
@@ -69,7 +69,9 @@ let countdownTime = 0
 
 let keyF = null
 
-let enemyVelocity = 100
+let enemyVelocity = 300
+
+let glowTween = null
 
 /* ======================
     GAME INTRO SCENE
@@ -266,6 +268,8 @@ class GameOver extends Phaser.Scene {
   }
   // Game Over scene create
   create() {
+    taiahaObj.taiahaPartsCollected = 0
+    taiahaObj.taiahaCollected = false
     // music
     this.scene.stop("game-hud")
     this.scene.stop("game-play")
@@ -597,16 +601,23 @@ class GamePlay extends Phaser.Scene {
     this.load.image('taiaha-glow', "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/taiaha-glow.png?v=1649904081002")
 
     this.load.image('enemy', "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/enemy.png?v=1649904103930")
-
+    this.load.spritesheet('bee', 
+      'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/bee_spritesheet.png?v=1650322708210', {
+      frameWidth: 128,
+      frameHeight: 128
+    })
+    this.load.spritesheet('hedgehog', 
+      'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/hedgehog_spritesheet.png?v=1650322649136', {
+      frameWidth: 128,
+      frameHeight: 128
+    })
     this.load.spritesheet('magic',
     'https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/1_magicspell_spritesheet.png?v=1649481473924', {
       frameWidth: 192,
       frameHeight: 192
     })
 
-    // ====================== player (atlas) =============================
-
-    // TANE !!! (From Ariki Creative)
+    // TANE (From Ariki Creative)
     this.load.spritesheet('taneIdle',
       'https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Ftane-idle.png?v=1606611069685', {
         frameWidth: 128,
@@ -653,34 +664,59 @@ class GamePlay extends Phaser.Scene {
     }
   );
 
-    // ====================== Tiled JSON map ===========================
-        
-    // OLIONI'S MAP
-        this.load.tilemapTiledJSON("map", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/olioni-map-3.json?v=1649904206832")
-        // this.load.tilemapTiledJSON("map", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/olioni-map.json?v=1649062631049")
-    
-    // ====================== Sound effects ===========================
-        // this.load.audio("jump", "assets/sfx/phaseJump1.wav");
-        this.load.audio(
-          "jump",
-          // "https://cdn.glitch.com/e46a9959-9af7-4acd-a785-ff3bc76f44d0%2Fquake-jump.ogg?v=1603606002409"
-          "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fjump.ogg?v=1609829224208"
-        );
-       
-        this.load.audio(
-          "hurt",
-          // "https://cdn.glitch.com/e46a9959-9af7-4acd-a785-ff3bc76f44d0%2Fquake-hurt.ogg?v=1603606002105"
-          "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fbad.ogg?v=1609829228399"
-        );
-        this.load.audio(
-          "good",
-          "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fgood.ogg?v=1609829222070"
-        );
-        this.load.audio(
-          "music",
-          "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fmusic-edited.ogg?v=1609829233382"
-        );
-
+  // ====================== Tiled JSON map ===========================
+      
+  // OLIONI'S MAP
+      this.load.tilemapTiledJSON("map", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/olioni-map-3.json?v=1650322562271")
+  
+  // ====================== Sound effects ===========================  
+  this.load.audio(
+    "hurt",
+    "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fbad.ogg?v=1609829228399"
+  );
+  this.load.audio(
+    "good",
+    "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fgood.ogg?v=1609829222070"
+  );
+  this.load.audio(
+    "maleJump1",
+    "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Jump%202.wav?v=1649892575856"
+  );
+  this.load.audio(
+    "maleJump2",
+    "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Jump%203.wav?v=1649892576040"
+  );
+  this.load.audio(
+    "maleJump3",
+    "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Jump%204.wav?v=1649892575908"
+  );
+  this.load.audio(
+    "maleJump4",
+    "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Jump%205.wav?v=1649892576222"
+  );
+  this.load.audio(
+    "maleJump5",
+    "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Jump%206.wav?v=1649892576326"
+  );
+  this.load.audio(
+    "maleJump6",
+    "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Jump%207.wav?v=1649892576626"
+  );
+  this.load.audio(
+    "maleJump7",
+    "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Jump%208.wav?v=1649892576839"
+  );
+  this.load.audio(
+    "maleJump8",
+    "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Jump%209.wav?v=1649892577079"
+  );
+  this.load.audio(
+    "maleJump9",
+    "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Jump%2010.wav?v=1649892577316"
+  );
+  this.load.audio("whoosh", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/whoosh.wav?v=1650322824544")
+  this.load.audio("ambience", "https://cdn.glitch.me/6ec21438-e8d9-4bed-8695-1a8695773d71/ambience.wav?v=1650322822754")
+  this.load.audio("music", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/Dreamy-Love-Tai-Collective.mp3?v=1650322799783")
     //  Load the Google WebFont Loader script
     this.load.script(
       "webfont",
@@ -704,8 +740,19 @@ class GamePlay extends Phaser.Scene {
       loop: true,
       delay: 3000
     }
+    const ambienceConfig = {
+      volume: 0.3,
+      loop: true,
+      delay: 3000
+    }
+    const fxConfig = {
+      volume: 1,
+      loop: false,
+      delay: 50
+    }
     this.music = this.sound.add("music", musicConfig);
-    // this.music.play();
+    this.ambience = this.sound.add("ambience", ambienceConfig)
+    this.whoosh = this.sound.add("whoosh", fxConfig)
 
     // ====================== background =============================
     const bgScale = 2
@@ -861,6 +908,24 @@ class GamePlay extends Phaser.Scene {
       frameRate: 15,
     });
 
+    this.anims.create({
+      key: 'hedgehogIdle',
+      frames: this.anims.generateFrameNumbers('hedgehog', {
+        frames: [0]
+      }),
+      frameRate: 5,
+      repeat: -1
+    })
+
+    this.anims.create({
+      key: 'hedgehogRun',
+      frames: this.anims.generateFrameNumbers('hedgehog', {
+        frames: [4, 5, 6, 7]
+      }),
+      frameRate: 5,
+      repeat: -1
+    })
+
     // ========= Mauri flame HUD
     this.mauriLayer = this.add.layer().setDepth(1005);
     this.hudX = 750
@@ -870,8 +935,6 @@ class GamePlay extends Phaser.Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
 
     // ====================== Object Layers =============================
-    // groups
-
     this.cagesObjects = this.physics.add.group({
       allowGravity: false,
       immovable: true
@@ -889,13 +952,17 @@ class GamePlay extends Phaser.Scene {
       immovable: false
     })
     this.enemyObjects = this.physics.add.group({
-      allowGravity: false,
+      allowGravity: true,
       immovable: true
     })
     this.taiahaGlowObjects = this.physics.add.group({
       allowGravity: false,
       immovable: true
     })
+    this.boundObjects = this.physics.add.group({
+      allowGravity: false,
+      immovable: true
+    }).setVisible(false)
 
     this.mauri = this.playerMauriObjects.create(0,0,'magic').setOrigin(0,0).setDepth(1001).setVisible(false)
 
@@ -911,6 +978,7 @@ class GamePlay extends Phaser.Scene {
     var enemyObjs = map.createFromObjects('Enemies', {
       key: 'enemy'
     })
+    var boundObjs = map.createFromObjects('Bounds')
 
     // ----- Bird Cages
     cagesObjs.forEach(cageObj => {
@@ -918,11 +986,9 @@ class GamePlay extends Phaser.Scene {
       cage.name = cageObj.name
       cage.type = cageObj.type
       cage.setDepth(201)
-      // console.log(cage)
       const cageCollider = this.physics.add.overlap(this.player, cage, this.touchingCage, null, this)
       cageCollider.name = cage.name 
     })
-    // this.cagesObjects
 
     // ----- Kiwis
     kiwiObjs.forEach(kiwiObj => {
@@ -940,10 +1006,6 @@ class GamePlay extends Phaser.Scene {
     let glowScale = 0.4
 
     taiahaObjs.forEach(taiahaObj => {
-      // let tool = this.taiahaObjects.create(toolObj.x * mapScale, (toolObj.y * mapScale) + mapYIndent, 'tool').setOrigin(0, 0).setScale(mapScale, mapScale)
-      // tool.name = toolObj.name
-      // tool.type = toolObj.type
-
       if (taiahaObj.name == 'head') {
         let taiaha = this.taiahaObjects.create(taiahaObj.x * mapScale, (taiahaObj.y * mapScale) + mapYIndent, 'taiaha-head-icon').setOrigin(0, 0).setScale(mapScale, mapScale)
         taiaha.name = taiahaObj.name
@@ -953,7 +1015,6 @@ class GamePlay extends Phaser.Scene {
 
         taiaha.setDepth(401)
         glow.setDepth(400)
-        glow.setAlpha(1)
 
         this.tweens.add({
           targets: taiaha,
@@ -966,7 +1027,6 @@ class GamePlay extends Phaser.Scene {
         this.tweens.add({
           targets: glow,
           y: ((taiahaObj.y * mapScale) + mapYIndent) + 20,
-          scale: mapScale + 0.1,
           duration: 2000,
           ease: 'Sine.easeInOut',
           repeat: -1,
@@ -978,11 +1038,11 @@ class GamePlay extends Phaser.Scene {
         taiaha.name = taiahaObj.name
         taiaha.type = taiahaObj.type
 
-        let glow = this.taiahaGlowObjects.create(taiahaObj.x * mapScale, (taiahaObj.y * mapScale) + mapYIndent, 'taiaha-glow').setOrigin(0, 0).setScale(glowScale, glowScale)
+        // let glow = this.taiahaGlowObjects.create((taiahaObj.x * mapScale) - 6.5, ((taiahaObj.y * mapScale) + mapYIndent) - 6, 'taiaha-glow').setOrigin(0, 0).setScale(glowScale, glowScale)
+        let glow = this.taiahaGlowObjects.create((taiahaObj.x * mapScale), ((taiahaObj.y * mapScale) + mapYIndent), 'taiaha-glow').setOrigin(0, 0).setScale(glowScale, glowScale)
 
         taiaha.setDepth(401)
         glow.setDepth(400)
-        glow.setAlpha(1)
 
         this.tweens.add({
           targets: taiaha,
@@ -1049,10 +1109,10 @@ class GamePlay extends Phaser.Scene {
         this.tweens.add({
           targets: glow,
           y: ((taiahaObj.y * mapScale) + mapYIndent) + 20,
-          scale: mapScale + 0.1,
           duration: 2000,
           ease: 'Sine.easeInOut',
           repeat: -1,
+          opacity: 1,
           yoyo: true
         })
       }
@@ -1063,21 +1123,38 @@ class GamePlay extends Phaser.Scene {
       let enemy = this.enemyObjects.create(enemyObj.x * mapScale, (enemyObj.y * mapScale) + mapYIndent, 'enemy').setOrigin(0, 0).setScale(mapScale, mapScale)
       enemy.name = enemyObj.name
       enemy.type = enemyObj.type
+      let random = Phaser.Math.Between(1, 2)
+      switch(random) {
+        case 1:
+          enemy.body.velocity.x = -enemyVelocity
+        case 2:
+          enemy.body.velocity.x = enemyVelocity
+      }
+      if (enemyObj.type == 'hedgehog') {
+        console.log('type found')
+        let enemy = this.enemyObjects.create(enemyObj.x * mapScale, (enemyObj.y * mapScale) + mapYIndent, 'hedgehogIdle').setOrigin(0, 0).setScale(mapScale, mapScale)
+        enemy.name = enemyObj.name
+        enemy.type = enemyObj.type
+      }
     })
 
-    // other functions to get objects
-    // let Bridge = map.getObjectLayer("Bridge")["objects"];
-    // map.findObject("Bridge", obj => obj.name == "bridge");
+    boundObjs.forEach(boundObj => {
+      let boundBox = this.boundObjects.create(boundObj.x * mapScale, (boundObj.y * mapScale) + mapYIndent, null).setOrigin(0, 0).setVisible(false)
+      boundBox.name = boundObj.name
+      boundBox.type = boundObj.type
+    })
 
     // ====================== Colliders ======================
     this.physics.add.collider(this.player, platforms);
     this.physics.add.collider(this.player, bridges);
     this.physics.add.collider(this.player, crates);
 
-    this.physics.add.collider(this.enemyObjects, platforms, this.enemyTouchingPlatforms, null, this)
+    this.physics.add.collider(this.enemyObjects, platforms)
     this.physics.add.collider(this.enemyObjects, bridges)
     this.physics.add.collider(this.enemyObjects, crates)
     
+    this.physics.add.collider(this.enemyObjects, this.boundObjects, this.touchingBound, null, this)
+
     //----- Key colliders/actions
     // this.physics.add.collider(this.player, this.levelObjects);
     this.physics.add.overlap(this.player, this.kiwisObjects, this.touchingKiwi, null, this)
@@ -1085,19 +1162,19 @@ class GamePlay extends Phaser.Scene {
     this.physics.add.overlap(this.player, this.taiahaGlowObjects, this.touchingGlow, null, this)
     this.physics.add.overlap(this.player, this.enemyObjects, this.touchingEnemy, null, this)
 
-    this.enemyObjects.setVelocityX(100)
-
+    // Add new key on the keyboard F, to use as attack button
     keyF = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
 
     this.playerAttacking = false
+
+    this.music.play(this.musicConfig)
+    this.ambience.play(this.ambienceConfig)
   }
   //   Game Play Update (this is updating all the time)
   update() {
-    // console.log(this.player.x, this.player.y )
-
     const playerJump = -300
     const playerVelocity = 350
-    
+
     // Control the player with left or right keys
     if (this.cursors.left.isDown) {
       this.player.setVelocityX(-playerVelocity);
@@ -1109,12 +1186,6 @@ class GamePlay extends Phaser.Scene {
       if (this.player.body.onFloor()) {
         this.player.play('taneRun', true);
       }
-    } else if (keyF.isDown) {
-      this.playerAttacking = true
-      this.player.play('taneAttack', false)
-      this.player.on('animationcomplete', () => {
-        this.playerAttacking = false
-      })
     } else {
       // If no keys are pressed, the player keeps still
       this.player.setVelocityX(0);
@@ -1124,6 +1195,16 @@ class GamePlay extends Phaser.Scene {
         this.player.play('taneIdle', false);
       }
     }
+    if (this.player.body.velocity.x == 0) {
+      if (keyF.isDown == true && this.player.body.onFloor() && this.playerAttacking == false) {
+        this.whoosh.play(this.fxConfig)
+        this.playerAttacking = true
+        this.player.play('taneAttack', false)
+        this.player.on('animationcomplete', () => {
+          this.playerAttacking = false
+        })
+      }
+    }
 
     // Player can jump while walking any direction by pressing the space bar
     if (this.cursors.space.isDown && this.player.body.onFloor()) {
@@ -1131,7 +1212,38 @@ class GamePlay extends Phaser.Scene {
       this.jumptimer = 1;
       this.player.body.velocity.y = playerJump;
       this.player.play('taneJump', false);
-      // this.sound.play("jump"); 
+      const random = Phaser.Math.Between(1, 9)
+      switch (random) {
+        case 1:
+          this.sound.play("maleJump1"); 
+          break
+        case 2:
+          this.sound.play("maleJump2"); 
+          break
+        case 3:
+          this.sound.play("maleJump3"); 
+          break
+        case 4:
+          this.sound.play("maleJump4"); 
+          break
+        case 5:
+          this.sound.play("maleJump5"); 
+          break
+        case 6:
+          this.sound.play("maleJump6"); 
+          break
+        case 7:
+          this.sound.play("maleJump7"); 
+          break
+        case 8:
+          this.sound.play("maleJump8"); 
+          break
+        case 9:
+          this.sound.play("maleJump9"); 
+          break
+        default:
+          return;
+      } 
     } else if (this.cursors.space.isDown && (this.jumptimer != 0)) {
       //player is no longer on the ground, but is still holding the jump key
       if (this.jumptimer > 30) { // player has been holding jump for over 30 frames, it's time to stop him
@@ -1154,17 +1266,13 @@ class GamePlay extends Phaser.Scene {
       // otherwise, make them face the other side
       this.player.setFlipX(false);
     }
+
   }
   
   // Other custom game functions
   // ================ death function ========================
   playerHit(player, spike) {
     console.log("player was hit")
-    // player.setVelocity(0, 0);
-    // player.setX(50);
-    // player.setY(300);
-    // player.play('idle', true);
-    // player.setAlpha(0);
     let tw = this.tweens.add({
       targets: player,
       alpha: 1,
@@ -1175,69 +1283,7 @@ class GamePlay extends Phaser.Scene {
     console.log("player died")
     // this.scene.start("game-over")
   }
-  // ================ got key function ========================
-  handleGotKey(player, key) {
-    console.log("player got ", key.name, " key")
-    this.sound.play("good"); 
-    key.destroy();
-    switch (key.name) {
-      case "greenKey":
-        this.gotKeyGreen = true;
-        break;
-      case "yellowKey":
-        this.gotKeyYellow = true;
-        break;
-      case "redKey":
-        this.gotKeyRed = true;
-        break;
-      default:
-        break;
-    }
-  }
-  // ================ open lock function ========================
-  tryOpenLock(player, lock) {
-    // if they have the key then destroy this lock
-    switch (lock.name) {
-      case "greenLock":
-        if (this.gotKeyGreen == true) {
-          this.sound.play("good"); 
-          lock.destroy();
-          if (completedGreenMission == false) {
-            completedGreenMission = true
-            tokenGreenOverlay.destroy();
-            tokenGreenTabGroup.toggleVisible()
-            tokenYellowTabGroup.toggleVisible()
-          }
-        }
-        break;
-      case "yellowLock":
-        if (this.gotKeyYellow == true) {
-          this.sound.play("good"); 
-          lock.destroy();
-          if (completedYellowMission == false) {
-            completedYellowMission = true
-            tokenYellowOverlay.destroy();
-            tokenYellowTabGroup.toggleVisible()
-            tokenRedTabGroup.toggleVisible()
-        }
-      }
-        break;
-      case "redLock":
-        if (this.gotKeyRed == true) {
-          this.sound.play("good"); 
-          lock.destroy();
-          if (completedRedMission == false) {
-            completedRedMission = true
-            tokenRedOverlay.destroy();
-            tokenRedTabGroup.toggleVisible()
-          }
-        }
-        break;
-      default:
-        break;
-    }
-  }
-
+  
     // ================ open lock function ========================
   reachedExit(player, exit) {
     this.scene.start('game-win')
@@ -1245,7 +1291,7 @@ class GamePlay extends Phaser.Scene {
   
   // ===== CHECK CAGE FUNCTION =====
   touchingCage(player, cage) {
-    if (taiahaObj.taiahaPartsCollected == 4 && taiahaObj.taiahaCollected == true) {
+    if (taiahaObj.taiahaPartsCollected >= 4 && taiahaObj.taiahaCollected == true && player.body.velocity.x == 0) {
       if (keyF.isDown) {
         const cageCollider = this.physics.world.colliders.getActive().find(function(i){
           return i.name == cage.name
@@ -1263,10 +1309,12 @@ class GamePlay extends Phaser.Scene {
   }
   touchingKiwi(player, kiwi) {
     if (taiahaObj.taiahaCollected == true) {
-      if (keyF.isDown) {
-        console.log("go kiwi")
-        kiwi.setVelocityX(-200)
-        kiwi.play('kiwiRun', true);
+      if (player.body.velocity.x == 0) {
+        if (keyF.isDown) {
+          console.log("go kiwi")
+          kiwi.setVelocityX(-200)
+          kiwi.play('kiwiRun', true);
+        }
       }
     }
   }
@@ -1302,20 +1350,14 @@ class GamePlay extends Phaser.Scene {
       .setScrollFactor(0).setScale(2).setDepth(1003)
     mauriFlame.play("mauri1Anim",true)
   }
-  enemyTouchingPlatforms(enemy, ground) {
-    // console.log(enemy)
-    if (enemy.body.blocked.right) {
-      // console.log('collision right')
+  touchingEnemy(player, enemy) {
+    this.scene.start("game-over")
+  }
+  touchingBound(enemy, bound) {
+    if (enemy.body.velocity.x > 0) {
       enemy.body.velocity.x = -enemyVelocity
-    } else if (enemy.body.blocked.left) {
-      // console.log('collision left')
+    } else {
       enemy.body.velocity.x = enemyVelocity
     }
-  }
-  touchingEnemy(player, enemy) {
-
-  }
-  keyPressed() {
-    console.log('pressed')
   }
 }
