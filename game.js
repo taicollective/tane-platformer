@@ -1196,14 +1196,16 @@ class GamePlay extends Phaser.Scene {
       }
     }
     if (this.player.body.velocity.x == 0) {
-      if (keyF.isDown == true && this.player.body.onFloor() && this.playerAttacking == false) {
-        this.whoosh.play(this.fxConfig)
-        this.playerAttacking = true
-        this.player.play('taneAttack', false)
-        this.player.on('animationcomplete', () => {
-          this.playerAttacking = false
-        })
-      }
+      if (taiahaObj.taiahaCollected == true && taiahaObj.taiahaPartsCollected >= 4) {
+        if (keyF.isDown == true && this.player.body.onFloor() && this.playerAttacking == false) {
+          this.whoosh.play(this.fxConfig)
+          this.playerAttacking = true
+          this.player.play('taneAttack', false)
+          this.player.on('animationcomplete', () => {
+            this.playerAttacking = false
+          })
+        }
+      } 
     }
 
     // Player can jump while walking any direction by pressing the space bar
