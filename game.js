@@ -442,7 +442,7 @@ class GameHud extends Phaser.Scene {
     );
 
     // Taiaha Parts for the HUD
-    this.load.image("grey-taiaha", "images/HUD/grey taiaha 2.png")
+    this.load.image("grey-taiaha", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/grey%20taiaha%202.png?v=1650343143905")
     this.load.image("tongue-taiaha", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/taiaha%20tongue.png?v=1649646916693")
     this.load.image("head-taiaha", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/taiaha%20head.png?v=1649646913292")
     this.load.image("front-taiaha", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/taiaha%20front.png?v=1649646907989")
