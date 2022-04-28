@@ -469,7 +469,7 @@ class GameIntro extends Phaser.Scene {
     // ====================== Tiled JSON map ===========================
 
     // OLIONI'S MAP
-    this.load.tilemapTiledJSON("map", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/olioni-map-3.json?v=1651113552684")
+    this.load.tilemapTiledJSON("map", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/olioni-map-3.json?v=1651115855825")
     // this.load.tilemapTiledJSON("map", "../map/olioni-map-3.json");
 
     // ====================== Sound effects ===========================
