@@ -2199,8 +2199,8 @@ class GamePlay extends Phaser.Scene {
           backTaiaha,
           greyTaiaha,
         ],
-        x: screenCenterX,
-        y: screenCenterY * 0.4 + -100,
+        x: 650,
+        y: 950 * 0.4 + -100,
         duration: 1000,
         // ease: "Bounce", // 'Cubic', 'Elastic', 'Bounce', 'Back'
         //repeat: -1, // -1: infinity
