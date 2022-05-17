@@ -9,7 +9,7 @@ Help Tāne to collect all the pieces of his taiaha, so he can use it to free the
 
 Game develop by Tai Collective for Te Tihi's app Te Mauri Moemoeā
 
-Tai Collective developers that worked on Tāne Ascent:
+Tai Collective developers that worked on Tāne Platformer:
 [@olioni](https://github.com/olioni)
 [@tairea](https://github.com/tairea)
 
