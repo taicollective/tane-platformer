@@ -663,19 +663,19 @@ class GameIntro extends Phaser.Scene {
     );
 
     // game-over preloads
-    this.load.audio(
-      "die",
-      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/death.mp3?v=1649896854596"
-    );
-    this.load.audio(
-      "end-music",
-      "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fgameover-music.mp3?v=1609829224481"
-    );
+    //     this.load.audio(
+    //       "die",
+    //       "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/death_7_sean.mp3?v=1652937752144"
+    //     );
+    //     this.load.audio(
+    //       "end-music",
+    //       "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fgameover-music.mp3?v=1609829224481"
+    //     );
 
-    this.load.image(
-      "kowhaiwhai",
-      "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fkowhaiwhai.png?v=1609829230478"
-    );
+    //     this.load.image(
+    //       "kowhaiwhai",
+    //       "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fkowhaiwhai.png?v=1609829230478"
+    //     );
 
     // Pre-loader
     this.load.on("progress", function (value) {
@@ -884,6 +884,19 @@ class GameOver extends Phaser.Scene {
   // Game Over scene preload
   preload() {
     // game over assets preload in intro-scene
+    this.load.audio(
+      "die",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/death_7_sean.mp3?v=1652937752144"
+    );
+    this.load.audio(
+      "end-music",
+      "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fgameover-music.mp3?v=1609829224481"
+    );
+
+    this.load.image(
+      "kowhaiwhai",
+      "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fkowhaiwhai.png?v=1609829230478"
+    );
   }
   // Game Over scene create
   create() {
