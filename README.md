@@ -1,7 +1,7 @@
 Tāne Platformer
 =================
 
-Live game: [https://tane-platformer-oli.glitch.me/](https://tane-platformer-oli.glitch.me/)
+Live game: [https://tane-platformer.glitch.me/](https://tane-platformer.glitch.me/)
 
 ------------
 
