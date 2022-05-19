@@ -7,10 +7,10 @@ window.onload = function () {
     backgroundColor: 0xb7cc1c,
     parent: "game",
     scale: {
-      // mode: Phaser.Scale.FIT,
+      mode: Phaser.Scale.FIT,
       autoCenter: Phaser.Scale.CENTER_BOTH,
       parent: "thegame",
-      width: 1300,
+      width: 889,
       height: 500,
     },
     physics: {
@@ -65,6 +65,112 @@ let glowTween = null;
 let winText = null;
 
 let mauriCount = 0;
+
+/**
+ * ControlsSprite
+ */
+class ControlsSprite extends Phaser.GameObjects.Image {
+  constructor(scene, x, y, config) {
+    super(scene, y, x, 'controls');
+    scene.add.existing(this);
+    this.setX(x)
+      .setY(y)
+      .setAlpha(0.4)
+      .setRotation(config.rotation)
+      .setScrollFactor(0)
+      .setScale(0.5);
+    this.type = config.type;
+    // hide control on non-touch devices
+    if (!scene.sys.game.device.input.touch)
+      this.setAlpha(0);
+  }
+}
+
+/**
+ * Controls
+ */
+class Controls {
+  constructor(scene) {
+    this.buttons = {};
+    this._width = 96;
+    this._height = 96;
+    this._scene = scene;
+    this._config = [
+      {
+        type: 'left',
+        rotation: 1.5 * Math.PI
+      },
+      {
+        type: 'right',
+        rotation: 0.5 * Math.PI
+      },
+      {
+        type: 'up',
+        rotation: 0
+      }
+    ];
+    this._config.forEach(el => {
+      this.buttons[el.type] = new ControlsSprite(scene, 0, 0, el);
+    });
+  }
+  adjustPositions() {
+    let width = this._scene.cameras.main.width;
+    let height = this._scene.cameras.main.height;
+    this.buttons.left.x = 70;
+    this.buttons.left.y = height - 70;
+    this.buttons.right.x = 70 + 90 + 25;
+    this.buttons.right.y = height - 70;
+    this.buttons.up.x = width - 70;
+    this.buttons.up.y = height - 70;
+  }
+  update() {
+    this.leftIsDown = false;
+    this.rightIsDown = false;
+    this.upIsDown = false;
+    let pointers = [];
+    if (this._scene.input.pointer1 != null) {
+      pointers.push(this._scene.input.pointer1);
+    }
+    if (this._scene.input.pointer2 != null) {
+      pointers.push(this._scene.input.pointer2);
+    }
+    let buttons = [this.buttons.left, this.buttons.right, this.buttons.up];
+    // check which pointer pressed which button
+    pointers.forEach(pointer => {
+      if (pointer.isDown) {
+        console.log(pointer.x, pointer.y);
+        let hit = buttons.filter(btn => {
+          let x = btn.x - this._width / 2 < pointer.x && btn.x + this._width / 2 > pointer.x;
+          let y = btn.y - this._height / 2 < pointer.y && btn.y + this._height / 2 > pointer.y;
+          return x && y;
+        });
+        console.log("hit", hit)
+        if (hit.length === 1) {
+          // switch (hit[0].type) {
+          //   case 'left':
+          //     this.leftIsDown = true;
+          //     break;
+          //   case 'right':
+          //     this.rightIsDown = true;
+          //     break;
+          //   case 'up':
+          //     this.upIsDown = true;
+          //     break;
+          // }e
+          if (hit[0].type == "left") {
+            this.leftIsDown = true;
+          }
+          if (hit[0].type == "right") {
+            this.rightIsDown = true;
+          }
+          if (hit[0].type == "up") {
+            this.upIsDown = true;
+          }
+        }
+      }
+    });
+  }
+}
 
 /* ======================
     GAME INTRO SCENE
@@ -212,7 +318,7 @@ class GameIntro extends Phaser.Scene {
         frameHeight: 52,
       }
     );
-    
+
 
     this.load.image(
       "fire",
@@ -351,6 +457,10 @@ class GameIntro extends Phaser.Scene {
     this.load.image(
       "spikes",
       "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fspikes.png?v=1599014843516"
+    );
+    this.load.image(
+      "controls",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/controls.png?v=1652917774226"
     );
 
     this.load.spritesheet(
@@ -756,7 +866,7 @@ class GameIntro extends Phaser.Scene {
       },
     });
   }
-  update() {}
+  update() { }
 }
 
 /* ======================
@@ -819,10 +929,11 @@ class GameOver extends Phaser.Scene {
         families: ["Freckle Face", "Finger Paint", "Nosifer"],
       },
       active: () => {
+        // game over
         this.gameOver = this.add
           .text(
             game.config.width / 2,
-            game.config.height / 2 - 50,
+            game.config.height / 2 - 100,
             "Game Over",
             {
               fontFamily: "Freckle Face",
@@ -835,11 +946,12 @@ class GameOver extends Phaser.Scene {
         this.gameOver.setOrigin();
         this.gameOver.setScrollFactor(0);
 
+        // restart button
         this.pressRestart = this.add
           .text(
             game.config.width / 2,
-            game.config.height / 2 + 50,
-            "Press Space to Restart",
+            game.config.height / 2,
+            "Restart Game",
             {
               fontFamily: "Finger Paint",
               fontSize: 20,
@@ -850,12 +962,34 @@ class GameOver extends Phaser.Scene {
         this.pressRestart.setAlign("center");
         this.pressRestart.setOrigin();
         this.pressRestart.setScrollFactor(0);
+        this.pressRestart.setInteractive()
+        this.pressRestart.on('pointerdown', () => this.scene.start("game-play"));
+
+        // quit button
+        this.pressQuit = this.add
+          .text(
+            game.config.width / 2,
+            game.config.height / 2 + 80,
+            "Quit Game",
+            {
+              fontFamily: "Finger Paint",
+              fontSize: 20,
+              color: "#ffffff",
+            }
+          )
+          .setShadow(2, 2, "#333333", 2, false, true);
+        this.pressQuit.setAlign("center");
+        this.pressQuit.setOrigin();
+        this.pressQuit.setScrollFactor(0);
+        this.pressQuit.setInteractive()
+        this.pressQuit.on('pointerdown', () => {
+          //TODO: @FFF quit back to app
+          console.log("quit back to app")
+        });
       },
     });
 
-    this.input.keyboard.once("keydown-SPACE", () => {
-      this.scene.start("game-play");
-    });
+
   }
 }
 
@@ -915,7 +1049,7 @@ class GameHud extends Phaser.Scene {
         this.timer = this.add
           .text(game.config.width / 2, 50, "Time: " + countdownTime, {
             fontFamily: "Freckle Face",
-            fontSize: 50,
+            fontSize: 35,
             color: "#ffffff",
           })
           .setShadow(2, 2, "#333333", 2, false, true);
@@ -941,15 +1075,15 @@ class GameHud extends Phaser.Scene {
       active: () => {
         tally = this.add
           .text(
-            200,
+            150,
             50,
             "Parts Collected: " +
-              taiahaObj.taiahaPartsCollected +
-              "/" +
-              taiahaObj.totalTaiahaParts,
+            taiahaObj.taiahaPartsCollected +
+            "/" +
+            taiahaObj.totalTaiahaParts,
             {
               fontFamily: "Freckle Face",
-              fontSize: 40,
+              fontSize: 25,
               color: "#ffffff",
             }
           )
@@ -1006,24 +1140,24 @@ class GameHud extends Phaser.Scene {
       repeat: -1,
     });
 
-    let taiahaScale = 0.4;
+    let taiahaScale = 0.3;
 
-    greyTaiaha = this.add.image(200, 80, "grey-taiaha");
+    greyTaiaha = this.add.image(150, 80, "grey-taiaha");
     greyTaiaha.setScale(taiahaScale, taiahaScale);
 
-    tongueTaiaha = this.add.image(200, 80, "tongue-taiaha");
+    tongueTaiaha = this.add.image(150, 80, "tongue-taiaha");
     tongueTaiaha.setScale(taiahaScale, taiahaScale);
     tongueTaiaha.setVisible(false);
 
-    headTaiaha = this.add.image(200, 80, "head-taiaha");
+    headTaiaha = this.add.image(150, 80, "head-taiaha");
     headTaiaha.setScale(taiahaScale, taiahaScale);
     headTaiaha.setVisible(false);
 
-    frontTaiaha = this.add.image(200, 80, "front-taiaha");
+    frontTaiaha = this.add.image(150, 80, "front-taiaha");
     frontTaiaha.setScale(taiahaScale, taiahaScale);
     frontTaiaha.setVisible(false);
 
-    backTaiaha = this.add.image(200, 80, "back-taiaha");
+    backTaiaha = this.add.image(150, 80, "back-taiaha");
     backTaiaha.setScale(taiahaScale, taiahaScale);
     backTaiaha.setVisible(false);
   }
@@ -1043,7 +1177,7 @@ class GameHud extends Phaser.Scene {
   }
 
   // method to be executed at each frame
-  update() {}
+  update() { }
 }
 
 /* ======================
@@ -1081,9 +1215,9 @@ class GamePlay extends Phaser.Scene {
   }
 
   create() {
-    console.log('this.cameras.main.height',this.cameras.main.height);
-    console.log('this.cameras.main.width',this.cameras.main.width);
-    console.log('game.config.width',game.config.width);
+    console.log('this.cameras.main.height', this.cameras.main.height);
+    console.log('this.cameras.main.width', this.cameras.main.width);
+    console.log('game.config.width', game.config.width);
 
     this.scene.stop("game-intro");
     // ====================== map =============================
@@ -1880,6 +2014,10 @@ class GamePlay extends Phaser.Scene {
     keyF = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
 
     this.playerAttacking = false;
+
+    this.input.addPointer(1);
+    this.controls = new Controls(this);
+    this.controls.adjustPositions();
   }
 
   /* ================================
@@ -1891,6 +2029,8 @@ class GamePlay extends Phaser.Scene {
 
     const playerJump = -370;
     const playerVelocity = 350;
+
+    this.controls.update();
 
     // ensures player sticks to moving platforms
 
@@ -1926,12 +2066,12 @@ class GamePlay extends Phaser.Scene {
     }
 
     // Control the player with left or right keys
-    if (this.cursors.left.isDown) {
+    if (this.cursors.left.isDown || this.controls.leftIsDown) {
       this.player.setVelocityX(-playerVelocity);
       if (this.player.body.onFloor()) {
         this.player.play("taneRun", true);
       }
-    } else if (this.cursors.right.isDown) {
+    } else if (this.cursors.right.isDown || this.controls.rightIsDown) {
       this.player.setVelocityX(playerVelocity);
       if (this.player.body.onFloor()) {
         this.player.play("taneRun", true);
@@ -1971,7 +2111,7 @@ class GamePlay extends Phaser.Scene {
     // }
 
     // Player can jump while walking any direction by pressing the space bar
-    if (this.cursors.space.isDown && this.player.body.onFloor()) {
+    if ((this.cursors.space.isDown || this.controls.upIsDown) && this.player.body.onFloor()) {
       //player is on the ground, so he is allowed to start a jump
       this.jumptimer = 1;
       this.player.body.velocity.y = playerJump;
@@ -2008,7 +2148,7 @@ class GamePlay extends Phaser.Scene {
         default:
           return;
       }
-    } else if (this.cursors.space.isDown && this.jumptimer != 0) {
+    } else if ((this.cursors.space.isDown || this.controls.upIsDown) && this.jumptimer != 0) {
       //player is no longer on the ground, but is still holding the jump key
       if (this.jumptimer > 15) {
         // player has been holding jump for over 30 frames, it's time to stop him
@@ -2046,7 +2186,7 @@ class GamePlay extends Phaser.Scene {
       text: scene.add
         .text(0, 0, text, {
           fontFamily: "Freckle Face",
-          fontSize: "24px",
+          fontSize: "14px",
           color: "#ffffff",
         })
         .setShadow(2, 2, "#333333", 2, false, true)
@@ -2172,9 +2312,9 @@ class GamePlay extends Phaser.Scene {
 
     tally.setText(
       "Parts Collected: " +
-        taiahaObj.taiahaPartsCollected +
-        "/" +
-        taiahaObj.totalTaiahaParts
+      taiahaObj.taiahaPartsCollected +
+      "/" +
+      taiahaObj.totalTaiahaParts
     );
 
     if (taiahaObj.taiahaPartsCollected == 4) {
@@ -2407,7 +2547,7 @@ class GamePlay extends Phaser.Scene {
 
   launchFireworks() {
     this.sound.play("fireworksSound");
-    
+
     const bottomOfScreen = this.cameras.main.height + 500
     const rand1x = Phaser.Math.Between(0, 2000);
     const rand1y = Phaser.Math.Between(200, 500);
@@ -2443,7 +2583,7 @@ class GamePlay extends Phaser.Scene {
         fireworks1.play("fireworksBlue");
       });
   }
- 
+
 
   finishGame() {
     // this.scene.start('game-win')
@@ -2456,24 +2596,24 @@ class GamePlay extends Phaser.Scene {
         this.gameFinished = true;
         console.log("game finished");
 
-         //================= FIREWORKS =================
-  this.launchFireworks();
-  // launch fireworks to the amount of dreams collected
-  for (var i = 1; i < 10; i++) {
-    this.time.addEvent({
-      delay: i * 1000,
-      callback: this.launchFireworks,
-      callbackScope: this,
-    });
-  }
+        //================= FIREWORKS =================
+        this.launchFireworks();
+        // launch fireworks to the amount of dreams collected
+        for (var i = 1; i < 10; i++) {
+          this.time.addEvent({
+            delay: i * 1000,
+            callback: this.launchFireworks,
+            callbackScope: this,
+          });
+        }
 
         this.sound.play("cheer");
 
-              // center text: https://www.stephengarside.co.uk/blog/phaser-3-center-text-in-middle-of-screen/
-      const screenCenterX =
-      this.cameras.main.worldView.x + this.cameras.main.width / 2;
-    const screenCenterY =
-      this.cameras.main.worldView.y + this.cameras.main.height / 2;
+        // center text: https://www.stephengarside.co.uk/blog/phaser-3-center-text-in-middle-of-screen/
+        const screenCenterX =
+          this.cameras.main.worldView.x + this.cameras.main.width / 2;
+        const screenCenterY =
+          this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
         this.dialog4 = this.rexUI.add
           .dialog({
@@ -2490,13 +2630,13 @@ class GamePlay extends Phaser.Scene {
             ),
             content: this.createLabel(this, "Thank you for freeing the manu!!!\nYou have recieved another\npiece of your dream.", 20, 20),
             description: this.add
-            .sprite({
-              x: 0,
-              y: 0,
-              key: "dreamDiamond",
-            })
-            .play("dreamDiamond")
-            .setDisplaySize(150, 150),
+              .sprite({
+                x: 0,
+                y: 0,
+                key: "dreamDiamond",
+              })
+              .play("dreamDiamond")
+              .setDisplaySize(150, 150),
             actions: [this.createLabel(this, "NEXT", 10, 10)],
             space: {
               left: 20,
@@ -2508,8 +2648,8 @@ class GamePlay extends Phaser.Scene {
               choice: 15,
               action: 15,
               description: 25,
-               descriptionLeft: 100,
-               descriptionRight: 100,
+              descriptionLeft: 100,
+              descriptionRight: 100,
             },
             align: {
               content: "center",
@@ -2566,31 +2706,31 @@ class GamePlay extends Phaser.Scene {
           //  .drawBounds(this.add.graphics(), 0xff0000)
           .popUp(1000)
           .setDepth(1003)
-          this.dialog5.setVisible(false);
+        this.dialog5.setVisible(false);
 
 
-          this.dialog4.on(
-            "button.click",
-            function (button) {
-              if (button.text === "NEXT") {
-                this.dialog4.setVisible(false);
-                this.dialog5.setVisible(true).popUp(1000);
-              }
-            },
-            this
-          );
-      
-          this.dialog5.on(
-            "button.click",
-            function (button) {
-              if (button.text === "DONE") {
-                console.log("starting game");
-                // this.scene.start("game-hud")
-                this.scene.start("game-play");
-              }
-            },
-            this
-          );
+        this.dialog4.on(
+          "button.click",
+          function (button) {
+            if (button.text === "NEXT") {
+              this.dialog4.setVisible(false);
+              this.dialog5.setVisible(true).popUp(1000);
+            }
+          },
+          this
+        );
+
+        this.dialog5.on(
+          "button.click",
+          function (button) {
+            if (button.text === "DONE") {
+              console.log("starting game");
+              // this.scene.start("game-hud")
+              this.scene.start("game-play");
+            }
+          },
+          this
+        );
 
       },
     });
