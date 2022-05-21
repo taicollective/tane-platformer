@@ -70,8 +70,8 @@ let mauriCount = 0;
  * ControlsSprite
  */
 class ControlsSprite extends Phaser.GameObjects.Image {
-  constructor(scene, x, y, config) {
-    super(scene, y, x, 'controls');
+  constructor(scene, x, y, config, image) {
+    super(scene, y, x, image);
     scene.add.existing(this);
     this.setX(x)
       .setY(y)
@@ -98,19 +98,27 @@ class Controls {
     this._config = [
       {
         type: 'left',
-        rotation: 1.5 * Math.PI
+        rotation: 1.5 * Math.PI,
+        image: 'controls'
       },
       {
         type: 'right',
-        rotation: 0.5 * Math.PI
+        rotation: 0.5 * Math.PI,
+        image: 'controls'
       },
       {
         type: 'up',
-        rotation: 0
+        rotation: 0,
+        image: 'controls'
+      },
+      {
+        type: 'attack',
+        rotation: 0,
+        image: 'taiaha'
       }
     ];
     this._config.forEach(el => {
-      this.buttons[el.type] = new ControlsSprite(scene, 0, 0, el);
+      this.buttons[el.type] = new ControlsSprite(scene, 0, 0, el, el.image);
     });
   }
   adjustPositions() {
@@ -122,11 +130,14 @@ class Controls {
     this.buttons.right.y = height - 70;
     this.buttons.up.x = width - 70;
     this.buttons.up.y = height - 70;
+    this.buttons.attack.x = width - 180;
+    this.buttons.attack.y = height - 70;
   }
   update() {
     this.leftIsDown = false;
     this.rightIsDown = false;
     this.upIsDown = false;
+    this.attackIsDown = false;
     let pointers = [];
     if (this._scene.input.pointer1 != null) {
       pointers.push(this._scene.input.pointer1);
@@ -134,38 +145,39 @@ class Controls {
     if (this._scene.input.pointer2 != null) {
       pointers.push(this._scene.input.pointer2);
     }
-    let buttons = [this.buttons.left, this.buttons.right, this.buttons.up];
+    let buttons = [this.buttons.left, this.buttons.right, this.buttons.up, this.buttons.attack];
     // check which pointer pressed which button
     pointers.forEach(pointer => {
       if (pointer.isDown) {
-        console.log(pointer.x, pointer.y);
         let hit = buttons.filter(btn => {
           let x = btn.x - this._width / 2 < pointer.x && btn.x + this._width / 2 > pointer.x;
           let y = btn.y - this._height / 2 < pointer.y && btn.y + this._height / 2 > pointer.y;
           return x && y;
         });
-        console.log("hit", hit)
         if (hit.length === 1) {
-          // switch (hit[0].type) {
-          //   case 'left':
-          //     this.leftIsDown = true;
-          //     break;
-          //   case 'right':
-          //     this.rightIsDown = true;
-          //     break;
-          //   case 'up':
-          //     this.upIsDown = true;
-          //     break;
-          // }e
-          if (hit[0].type == "left") {
-            this.leftIsDown = true;
+          switch (hit[0].type) {
+            case 'left':
+              this.leftIsDown = true;
+              break;
+            case 'right':
+              this.rightIsDown = true;
+              break;
+            case 'up':
+              this.upIsDown = true;
+              break;
+            case 'attack':
+              this.attackIsDown = true
+              break;
           }
-          if (hit[0].type == "right") {
-            this.rightIsDown = true;
-          }
-          if (hit[0].type == "up") {
-            this.upIsDown = true;
-          }
+          // if (hit[0].type == "left") {
+          //   this.leftIsDown = true;
+          // }
+          // if (hit[0].type == "right") {
+          //   this.rightIsDown = true;
+          // }
+          // if (hit[0].type == "up") {
+          //   this.upIsDown = true;
+          // }
         }
       }
     });
@@ -462,6 +474,10 @@ class GameIntro extends Phaser.Scene {
       "controls",
       "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/controls.png?v=1652917774226"
     );
+    this.load.image(
+      "taiaha",
+      "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/taiaha.png?v=1653113953639"
+    );
 
     this.load.spritesheet(
       "hedgehogRun",
@@ -580,7 +596,7 @@ class GameIntro extends Phaser.Scene {
 
     // OLIONI'S MAP
     this.load.tilemapTiledJSON("map", "https://cdn.glitch.global/6ec21438-e8d9-4bed-8695-1a8695773d71/olioni-map-3.json?v=1651115855825")
-    // this.load.tilemapTiledJSON("map", "../map/olioni-map-3.json");
+    // this.load.tilemapTiledJSON("map", "./olioni-map-3-test.json");
 
     // ====================== Sound effects ===========================
     this.load.audio(
@@ -1090,7 +1106,7 @@ class GameHud extends Phaser.Scene {
           .text(
             150,
             50,
-            "Parts Collected: " +
+            "Taiaha Parts: " +
             taiahaObj.taiahaPartsCollected +
             "/" +
             taiahaObj.totalTaiahaParts,
@@ -2103,7 +2119,7 @@ class GamePlay extends Phaser.Scene {
       taiahaObj.taiahaCollected == true &&
       taiahaObj.taiahaPartsCollected >= 4
     ) {
-      if (keyF.isDown == true && this.playerAttacking == false) {
+      if ((keyF.isDown == true || this.controls.attackIsDown) && this.playerAttacking == false) {
         this.playerAttacking = true;
         this.whoosh.play(this.fxConfig);
         this.player.play("taneAttack");
@@ -2238,7 +2254,7 @@ class GamePlay extends Phaser.Scene {
       taiahaObj.taiahaCollected == true &&
       player.body.velocity.x == 0
     ) {
-      if (keyF.isDown) {
+      if (keyF.isDown || this.controls.attackIsDown) {
         const cageCollider = this.physics.world.colliders
           .getActive()
           .find(function (i) {
@@ -2259,7 +2275,7 @@ class GamePlay extends Phaser.Scene {
   touchingBird(player, bird) {
     if (taiahaObj.taiahaCollected == true) {
       if (player.body.velocity.x == 0) {
-        if (keyF.isDown) {
+        if (keyF.isDown || this.controls.attackIsDown) {
           this.sound.play("birdSound");
           let random = Phaser.Math.Between(1, 2);
           if (bird.type == "kiwi") {
@@ -2332,7 +2348,7 @@ class GamePlay extends Phaser.Scene {
 
     if (taiahaObj.taiahaPartsCollected == 4) {
       console.log("ALL PARTS COLLECTED!");
-      tally.setText("Press F to use taiaha");
+      tally.setText("Taiaha Ready!");
       taiahaObj.taiahaCollected = true;
       // play sound
       this.sound.play("dreamSound");
@@ -2352,8 +2368,10 @@ class GamePlay extends Phaser.Scene {
           backTaiaha,
           greyTaiaha,
         ],
-        x: 650,
-        y: 950 * 0.4 + -100,
+        // x: 650,
+        // y: 950 * 0.4 + -100,
+        x: this.cameras.main.width / 2,
+        y: this.cameras.main.height / 2,
         duration: 1000,
         // ease: "Bounce", // 'Cubic', 'Elastic', 'Bounce', 'Back'
         //repeat: -1, // -1: infinity
@@ -2431,8 +2449,8 @@ class GamePlay extends Phaser.Scene {
               backTaiaha,
               greyTaiaha,
             ],
-            scaleX: 0.45,
-            scaleY: 0.45,
+            scaleX: 0.28,
+            scaleY: 0.28,
             duration: 1000,
             // ease: "Bounce", // 'Cubic', 'Elastic', 'Bounce', 'Back'
             repeat: -1, // -1: infinity
